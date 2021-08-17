@@ -33,9 +33,9 @@ func SplitSerialSlice(serials []model.Serial, batchSize int) [][]model.Serial {
 }
 
 func FilterIntSlice(slice []int, forbiddenValues []int) (filtered []int) {
-	forbiddenMap := IntSliceToMap(forbiddenValues)
+	forbiddenMap := intSliceToMap(forbiddenValues)
 	for _, element := range slice {
-		if !forbiddenMap[element] {
+		if _, exists := forbiddenMap[element]; !exists {
 			filtered = append(filtered, element)
 		}
 	}
