@@ -1,11 +1,8 @@
 package utils
 
 import (
-	"fmt"
 	"ova-serial-api/internal/model"
 )
-
-var FORBIDDEN_VALUES = map[int]bool{-2: true, 1: true, 2: true, 5: true}
 
 func SplitSlice(slice []int, batchSize int) (newSlice [][]int) {
 	remainder := len(slice) % batchSize
@@ -35,41 +32,12 @@ func SplitSerialSlice(serials []model.Serial, batchSize int) [][]model.Serial {
 	return newSlice
 }
 
-func FilterIntSlice(slice []int) (filtered []int) {
-	for i := range slice {
-		if !FORBIDDEN_VALUES[slice[i]] {
-			filtered = append(filtered, slice[i])
+func FilterIntSlice(slice []int, forbiddenValues []int) (filtered []int) {
+	forbiddenMap := IntSliceToMap(forbiddenValues)
+	for _, element := range slice {
+		if !forbiddenMap[element] {
+			filtered = append(filtered, element)
 		}
 	}
 	return
-}
-
-func Print2dIntSlice(slice [][]int) {
-	for _, subSlice := range slice {
-		Print1dIntSlice(subSlice)
-	}
-}
-
-func Print1dIntSlice(slice []int) {
-	fmt.Print("[ ")
-	for _, element := range slice {
-		fmt.Print(element)
-		fmt.Print(" ")
-	}
-	fmt.Println("]")
-}
-
-func Print2dSerialSlice(slice [][]model.Serial) {
-	for _, subSlice := range slice {
-		Print1dSerialSlice(subSlice)
-	}
-}
-
-func Print1dSerialSlice(slice []model.Serial) {
-	fmt.Println("[ ")
-	for _, element := range slice {
-		fmt.Print(" " + element.String())
-		fmt.Println(" ")
-	}
-	fmt.Println("]")
 }

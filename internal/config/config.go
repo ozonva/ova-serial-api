@@ -10,10 +10,6 @@ type Config struct {
 	test int
 }
 
-func (c Config) String() string {
-	return fmt.Sprintf("{test: %d}", c.test)
-}
-
 func UpdateConfig(path string, config *Config) error {
 	f, err := os.Open(path)
 	if err != nil {
@@ -24,7 +20,7 @@ func UpdateConfig(path string, config *Config) error {
 		err := f.Close()
 		fmt.Printf("Closing file: %s\n", path)
 		if err != nil {
-			panic(err)
+			fmt.Printf("An error occured: %+v", err)
 		}
 	}(path, f)
 
