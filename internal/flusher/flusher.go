@@ -29,7 +29,6 @@ func (f flusher) Flush(serials []model.Serial) []model.Serial {
 	var notSaved []model.Serial
 	for _, chunk := range utils.SplitSerialSlice(serials, f.chunkSize) {
 		err := f.serialRepo.AddEntities(chunk)
-
 		if err != nil {
 			notSaved = append(notSaved, chunk...)
 		}

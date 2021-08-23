@@ -5,6 +5,9 @@ import (
 )
 
 func SplitSlice(slice []int, batchSize int) (newSlice [][]int) {
+	if batchSize <= 0 {
+		batchSize = len(slice)
+	}
 	remainder := len(slice) % batchSize
 	newSlice = [][]int{}
 	for i := 0; i < len(slice); i += batchSize {
@@ -22,7 +25,6 @@ func SplitSerialSlice(serials []model.Serial, batchSize int) [][]model.Serial {
 	if batchSize <= 0 {
 		batchSize = len(serials)
 	}
-
 	remainder := len(serials) % batchSize
 	var newSlice [][]model.Serial
 	for i := 0; i < len(serials); i += batchSize {

@@ -17,7 +17,7 @@ var _ = Describe("Flusher", func() {
 		testFlusher flusher.Flusher
 	)
 
-	slice := []model.Serial{
+	serials := []model.Serial{
 		{UserID: 1, Title: "Friends", Genre: "comedy", Year: 1994, Seasons: 10},
 		{UserID: 2, Title: "Game of Thrones", Genre: "fantasy", Year: 2011, Seasons: 8},
 		{UserID: 3, Title: "Breaking Bad", Genre: "criminal", Year: 2008, Seasons: 5},
@@ -29,26 +29,23 @@ var _ = Describe("Flusher", func() {
 		mockRepo = mock_repo.NewMockRepo(mockCtrl)
 	})
 
-	Context("Flush with empty slice", func() {
-		testFlusher = flusher.NewFlusher(
-			1,
-			mockRepo,
-		)
-
-		It("should return nil", func() {
+	Context("Flush with no errors", func() {
+		It("should return nil for empty slice", func() {
+			testFlusher = flusher.NewFlusher(
+				1,
+				mockRepo,
+			)
 			zeroSlice := make([]model.Serial, 0)
 			Expect(testFlusher.Flush(zeroSlice)).Should(BeNil())
 		})
-	})
 
-	Context("Flush with not empty slice and no errors", func() {
 		It("should return nil for zero chunkSize", func() {
 			testFlusher = flusher.NewFlusher(
 				0,
 				mockRepo,
 			)
 			mockRepo.EXPECT().AddEntities(gomock.Len(4)).Return(nil)
-			Expect(testFlusher.Flush(slice)).Should(BeNil())
+			Expect(testFlusher.Flush(serials)).Should(BeNil())
 		})
 
 		It("should return nil for chunkSize equal to 1", func() {
@@ -57,7 +54,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo,
 			)
 			mockRepo.EXPECT().AddEntities(gomock.Len(1)).Times(4).Return(nil)
-			Expect(testFlusher.Flush(slice)).Should(BeNil())
+			Expect(testFlusher.Flush(serials)).Should(BeNil())
 		})
 
 		It("should return nil for chunkSize equal to 2", func() {
@@ -66,7 +63,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo,
 			)
 			mockRepo.EXPECT().AddEntities(gomock.Len(2)).Times(2).Return(nil)
-			Expect(testFlusher.Flush(slice)).Should(BeNil())
+			Expect(testFlusher.Flush(serials)).Should(BeNil())
 		})
 
 		It("should return nil for chunkSize equal to slice length minus 1", func() {
@@ -78,7 +75,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo.EXPECT().AddEntities(gomock.Len(3)).Return(nil),
 				mockRepo.EXPECT().AddEntities(gomock.Len(1)).Return(nil),
 			)
-			Expect(testFlusher.Flush(slice)).Should(BeNil())
+			Expect(testFlusher.Flush(serials)).Should(BeNil())
 		})
 
 		It("should return nil for chunkSize equal to slice length", func() {
@@ -87,7 +84,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo,
 			)
 			mockRepo.EXPECT().AddEntities(gomock.Len(4)).Return(nil)
-			Expect(testFlusher.Flush(slice)).Should(BeNil())
+			Expect(testFlusher.Flush(serials)).Should(BeNil())
 		})
 	})
 
@@ -103,7 +100,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo.EXPECT().AddEntities(gomock.Len(3)).Return(testError),
 				mockRepo.EXPECT().AddEntities(gomock.Len(1)).Return(nil),
 			)
-			Expect(testFlusher.Flush(slice)).To(Equal(slice[:3]))
+			Expect(testFlusher.Flush(serials)).To(Equal(serials[:3]))
 		})
 
 		It("should return chunk for error in the second chunk", func() {
@@ -115,7 +112,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo.EXPECT().AddEntities(gomock.Len(3)).Return(nil),
 				mockRepo.EXPECT().AddEntities(gomock.Len(1)).Return(testError),
 			)
-			Expect(testFlusher.Flush(slice)).To(Equal(slice[3:]))
+			Expect(testFlusher.Flush(serials)).To(Equal(serials[3:]))
 		})
 
 		It("should return chunk for error in both chunks", func() {
@@ -127,7 +124,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo.EXPECT().AddEntities(gomock.Len(3)).Return(testError),
 				mockRepo.EXPECT().AddEntities(gomock.Len(1)).Return(testError),
 			)
-			Expect(testFlusher.Flush(slice)).To(Equal(slice))
+			Expect(testFlusher.Flush(serials)).To(Equal(serials))
 		})
 	})
 })
