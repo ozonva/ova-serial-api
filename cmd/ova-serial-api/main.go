@@ -79,7 +79,7 @@ func testTask2() {
 }
 
 func testTask3() {
-	serial1 := model.Serial{UserID: 1, Title: "Firends", Genre: "comedy", Year: 1994, Seasons: 10}
+	serial1 := model.Serial{UserID: 1, Title: "Friends", Genre: "comedy", Year: 1994, Seasons: 10}
 	serial2 := model.Serial{UserID: 2, Title: "Game of Thrones", Genre: "fantasy", Year: 2011, Seasons: 8}
 	serial3 := model.Serial{UserID: 3, Title: "Breaking Bad", Genre: "criminal", Year: 2008, Seasons: 5}
 	serial4 := model.Serial{UserID: 4, Title: "The Big Bang Theory", Genre: "comedy", Year: 2007, Seasons: 12}
