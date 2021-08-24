@@ -4,12 +4,15 @@ import (
 	"ova-serial-api/internal/model"
 )
 
-func SplitSlice(slice []int, batchSize int) (newSlice [][]int) {
-	remainder := len(slice) % batchSize
+func SplitSlice(slice []int, batchSize uint) (newSlice [][]int) {
+	if batchSize == 0 {
+		batchSize = uint(len(slice))
+	}
+	remainder := len(slice) % int(batchSize)
 	newSlice = [][]int{}
-	for i := 0; i < len(slice); i += batchSize {
-		if i+batchSize <= len(slice) {
-			newSlice = append(newSlice, slice[i:i+batchSize])
+	for i := 0; i < len(slice); i += int(batchSize) {
+		if i+int(batchSize) <= len(slice) {
+			newSlice = append(newSlice, slice[i:i+int(batchSize)])
 		}
 	}
 	if remainder > 0 {
@@ -18,12 +21,15 @@ func SplitSlice(slice []int, batchSize int) (newSlice [][]int) {
 	return
 }
 
-func SplitSerialSlice(serials []model.Serial, batchSize int) [][]model.Serial {
-	remainder := len(serials) % batchSize
-	var newSlice [][]model.Serial
-	for i := 0; i < len(serials); i += batchSize {
-		if i+batchSize <= len(serials) {
-			newSlice = append(newSlice, serials[i:i+batchSize])
+func SplitSerialSlice(serials []model.Serial, batchSize uint) [][]model.Serial {
+	if batchSize == 0 {
+		batchSize = uint(len(serials))
+	}
+	remainder := len(serials) % int(batchSize)
+	newSlice := make([][]model.Serial, 0)
+	for i := 0; i < len(serials); i += int(batchSize) {
+		if i+int(batchSize) <= len(serials) {
+			newSlice = append(newSlice, serials[i:i+int(batchSize)])
 		}
 	}
 	if remainder > 0 {
@@ -34,6 +40,7 @@ func SplitSerialSlice(serials []model.Serial, batchSize int) [][]model.Serial {
 
 func FilterIntSlice(slice []int, forbiddenValues []int) (filtered []int) {
 	forbiddenMap := intSliceToMap(forbiddenValues)
+	filtered = make([]int, 0)
 	for _, element := range slice {
 		if _, exists := forbiddenMap[element]; !exists {
 			filtered = append(filtered, element)
