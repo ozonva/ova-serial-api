@@ -44,7 +44,7 @@ var _ = Describe("Flusher", func() {
 				0,
 				mockRepo,
 			)
-			mockRepo.EXPECT().AddEntities(gomock.Len(4)).Return(nil)
+			mockRepo.EXPECT().AddEntities(gomock.Len(1)).Times(4).Return(nil)
 			Expect(testFlusher.Flush(serials)).Should(BeNil())
 		})
 

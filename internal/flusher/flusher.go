@@ -11,7 +11,7 @@ type Flusher interface {
 }
 
 func NewFlusher(
-	chunkSize int,
+	chunkSize uint,
 	serialRepo repo.Repo,
 ) Flusher {
 	return &flusher{
@@ -21,7 +21,7 @@ func NewFlusher(
 }
 
 type flusher struct {
-	chunkSize  int
+	chunkSize  uint
 	serialRepo repo.Repo
 }
 
