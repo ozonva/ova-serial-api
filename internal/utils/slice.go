@@ -6,7 +6,7 @@ import (
 
 func SplitSlice(slice []int, batchSize uint) (newSlice [][]int) {
 	if batchSize == 0 {
-		batchSize = 1
+		batchSize = uint(len(slice))
 	}
 	remainder := len(slice) % int(batchSize)
 	newSlice = [][]int{}
@@ -23,7 +23,7 @@ func SplitSlice(slice []int, batchSize uint) (newSlice [][]int) {
 
 func SplitSerialSlice(serials []model.Serial, batchSize uint) [][]model.Serial {
 	if batchSize == 0 {
-		batchSize = 1
+		batchSize = uint(len(serials))
 	}
 	remainder := len(serials) % int(batchSize)
 	newSlice := make([][]model.Serial, 0)

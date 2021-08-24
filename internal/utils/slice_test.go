@@ -17,7 +17,7 @@ var _ = Describe("Slice", func() {
 		})
 
 		It("should return correct result for zero chunkSize", func() {
-			Expect(utils.SplitSlice(slice, 0)).To(Equal([][]int{{5}, {1}, {2}, {7}, {-1}}))
+			Expect(utils.SplitSlice(slice, 0)).To(Equal([][]int{{5, 1, 2, 7, -1}}))
 		})
 
 		It("should return correct result for chunkSize equal to 1", func() {
@@ -61,7 +61,7 @@ var _ = Describe("Slice", func() {
 
 		It("should return correct result for zero chunkSize", func() {
 			Expect(utils.SplitSerialSlice(slice, 0)).To(Equal([][]model.Serial{
-				{serial1}, {serial2}, {serial3}, {serial4},
+				{serial1, serial2, serial3, serial4},
 			}))
 		})
 

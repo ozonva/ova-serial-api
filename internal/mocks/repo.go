@@ -48,19 +48,19 @@ func (mr *MockRepoMockRecorder) AddEntities(entities interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddEntities", reflect.TypeOf((*MockRepo)(nil).AddEntities), entities)
 }
 
-// DescribeEntity mocks base method.
-func (m *MockRepo) DescribeEntity(entityId uint64) (*model.Serial, error) {
+// GetEntity mocks base method.
+func (m *MockRepo) GetEntity(entityId int64) (model.Serial, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DescribeEntity", entityId)
-	ret0, _ := ret[0].(*model.Serial)
+	ret := m.ctrl.Call(m, "GetEntity", entityId)
+	ret0, _ := ret[0].(model.Serial)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// DescribeEntity indicates an expected call of DescribeEntity.
-func (mr *MockRepoMockRecorder) DescribeEntity(entityId interface{}) *gomock.Call {
+// GetEntity indicates an expected call of GetEntity.
+func (mr *MockRepoMockRecorder) GetEntity(entityId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeEntity", reflect.TypeOf((*MockRepo)(nil).DescribeEntity), entityId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEntity", reflect.TypeOf((*MockRepo)(nil).GetEntity), entityId)
 }
 
 // ListEntities mocks base method.
