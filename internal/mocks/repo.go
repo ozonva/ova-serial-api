@@ -2,7 +2,7 @@
 // Source: internal/repo/repo.go
 
 // Package mock_repo is a generated GoMock package.
-package mock_repo
+package mock
 
 import (
 	model "ova-serial-api/internal/model"

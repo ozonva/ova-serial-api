@@ -25,7 +25,7 @@ func NewSaver(
 	flusher flusher.Flusher,
 	timeoutSec uint,
 ) Saver {
-	slice := make([]model.Serial, capacity)
+	slice := make([]model.Serial, 0, capacity)
 
 	s := saver{
 		capacity: capacity,
@@ -44,9 +44,6 @@ func NewSaver(
 }
 
 func (s *saver) Save(serial model.Serial) error {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
 	if len(s.storage) >= int(s.capacity) {
 		s.flush()
 
@@ -66,5 +63,7 @@ func (s *saver) flush() {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	s.storage = s.flusher.Flush(s.storage)
+	if len(s.storage) > 0 {
+		s.storage = s.flusher.Flush(s.storage)
+	}
 }
