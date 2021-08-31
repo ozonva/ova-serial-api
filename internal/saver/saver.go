@@ -1,23 +1,25 @@
 package saver
 
 import (
-	"errors"
+	"fmt"
 	"ova-serial-api/internal/flusher"
 	"ova-serial-api/internal/model"
-	"sync"
 	"time"
 )
 
 type Saver interface {
-	Save(serial model.Serial) error
+	Save(serial model.Serial)
+	Init()
 	Close()
 }
 
 type saver struct {
-	capacity uint
-	flusher  flusher.Flusher
-	storage  []model.Serial
-	mutex    sync.Mutex
+	capacity  uint
+	flusher   flusher.Flusher
+	storage   []model.Serial
+	ticker    *time.Ticker
+	saveChan  chan model.Serial
+	closeChan chan interface{}
 }
 
 func NewSaver(
@@ -27,42 +29,63 @@ func NewSaver(
 ) Saver {
 	slice := make([]model.Serial, 0, capacity)
 
-	s := saver{
-		capacity: capacity,
-		flusher:  flusher,
-		storage:  slice,
-	}
+	saveChan := make(chan model.Serial)
+	closeChan := make(chan interface{})
 
-	go func() {
-		for {
-			time.Sleep(time.Duration(timeoutSec) * time.Second)
-			s.flush()
-		}
-	}()
+	ticker := time.NewTicker(time.Duration(timeoutSec) * time.Second)
+
+	s := saver{
+		capacity:  capacity,
+		flusher:   flusher,
+		storage:   slice,
+		ticker:    ticker,
+		saveChan:  saveChan,
+		closeChan: closeChan,
+	}
 
 	return &s
 }
 
-func (s *saver) Save(serial model.Serial) error {
-	if len(s.storage) >= int(s.capacity) {
-		s.flush()
+func (s *saver) Init() {
+	go func() {
+		for {
+			select {
+			case <-s.ticker.C:
+				s.flush()
 
-		if len(s.storage) >= int(s.capacity) {
-			return errors.New("no capacity in storage")
+			case v, ok := <-s.saveChan:
+				if !ok {
+					fmt.Println("Error while reading save chan")
+					continue
+				}
+				s.storage = append(s.storage, v)
+
+			case _, ok := <-s.closeChan:
+				if !ok {
+					fmt.Println("Error while reading close chan")
+					continue
+				}
+
+				s.flush()
+				close(s.saveChan)
+				close(s.closeChan)
+				s.ticker.Stop()
+
+				return
+			}
 		}
-	}
-	s.storage = append(s.storage, serial)
-	return nil
+	}()
+}
+
+func (s *saver) Save(serial model.Serial) {
+	s.saveChan <- serial
 }
 
 func (s *saver) Close() {
-	s.flush()
+	s.closeChan <- struct{}{}
 }
 
 func (s *saver) flush() {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
 	if len(s.storage) > 0 {
 		s.storage = s.flusher.Flush(s.storage)
 	}
