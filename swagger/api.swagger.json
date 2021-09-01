@@ -1,0 +1,106 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "ova-serial-api.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "OvaSerialV1"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "apiCreateSerialResponseV1": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "apiGetSerialResponseV1": {
+      "type": "object",
+      "properties": {
+        "serial": {
+          "$ref": "#/definitions/apiSerialV1"
+        }
+      }
+    },
+    "apiListSerialsResponseV1": {
+      "type": "object",
+      "properties": {
+        "serials": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/apiSerialV1"
+          }
+        }
+      }
+    },
+    "apiSerialV1": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "userId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "Title": {
+          "type": "string"
+        },
+        "Genre": {
+          "type": "string"
+        },
+        "Year": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Seasons": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}
