@@ -8,9 +8,15 @@ import (
 )
 
 type Config struct {
-	FilePath string
+	filePath string
 	data     interface{}
 	mutex    sync.Mutex
+}
+
+func NewConfig(filePath string) Config {
+	return Config{
+		filePath: filePath,
+	}
 }
 
 func (config *Config) Update() (ret error) {
@@ -20,7 +26,7 @@ func (config *Config) Update() (ret error) {
 		config.mutex.Unlock()
 	}()
 
-	filename, _ := filepath.Abs(config.FilePath)
+	filename, _ := filepath.Abs(config.filePath)
 	yamlFile, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return err

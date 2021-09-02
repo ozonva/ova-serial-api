@@ -17,9 +17,7 @@ const (
 )
 
 func main() {
-	cfg := config.Config{
-		FilePath: configPath,
-	}
+	cfg := config.NewConfig(configPath)
 	go func() {
 		for {
 			err := cfg.Update()
