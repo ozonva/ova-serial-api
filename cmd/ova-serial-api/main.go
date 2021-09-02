@@ -17,26 +17,28 @@ const (
 )
 
 func main() {
-	var cfg config.Config
+	cfg := config.Config{
+		FilePath: configPath,
+	}
 	go func() {
 		for {
-			err := config.UpdateConfig(configPath, &cfg)
+			err := cfg.Update()
 			if err != nil {
 				log.Error().Msgf("Error while reading config: %s\n", err)
 			} else {
-				log.Debug().Msgf("Config '%s' updated: %+v\n", configPath, cfg.Data)
+				log.Debug().Msgf("Config '%s' updated: %+v\n", configPath, cfg.GetData())
 			}
 
 			time.Sleep(confUpdIntervalSec * time.Second)
 		}
 	}()
 
-	if err := run(); err != nil {
+	if err := startGRPCServer(); err != nil {
 		log.Fatal().Msgf("Error while starting server: %v", err)
 	}
 }
 
-func run() error {
+func startGRPCServer() error {
 	listen, err := net.Listen("tcp", grpcPort)
 	if err != nil {
 		log.Fatal().Msgf("failed to listen: %v", err)
