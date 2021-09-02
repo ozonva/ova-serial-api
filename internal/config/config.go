@@ -19,7 +19,7 @@ func UpdateConfig(path string, config *Config) (ret error) {
 
 	f, err := os.Open(path)
 	if err != nil {
-		ret = err
+		return err
 	}
 
 	defer func(path string, f *os.File) {
@@ -36,13 +36,13 @@ func UpdateConfig(path string, config *Config) (ret error) {
 	filename, _ := filepath.Abs(path)
 	yamlFile, err := ioutil.ReadFile(filename)
 	if err != nil {
-		ret = err
+		return err
 	}
 
 	err = yaml.Unmarshal(yamlFile, &config.Data)
 	if err != nil {
-		ret = err
+		return err
 	}
 
-	return
+	return nil
 }
