@@ -6,7 +6,7 @@
   },
   "tags": [
     {
-      "name": "OvaSerialV1"
+      "name": "OvaSerial"
     }
   ],
   "consumes": [
@@ -15,8 +15,144 @@
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/v1/serials": {
+      "get": {
+        "operationId": "OvaSerial_ListSerialsV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiListSerialsResponseV1"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "OvaSerial"
+        ]
+      },
+      "post": {
+        "operationId": "OvaSerial_CreateSerialV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCreateSerialResponseV1"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiCreateSerialRequestV1"
+            }
+          }
+        ],
+        "tags": [
+          "OvaSerial"
+        ]
+      }
+    },
+    "/v1/serials/{id}": {
+      "get": {
+        "operationId": "OvaSerial_GetSerialV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiGetSerialResponseV1"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "OvaSerial"
+        ]
+      },
+      "delete": {
+        "operationId": "OvaSerial_RemoveSerialV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "OvaSerial"
+        ]
+      }
+    }
+  },
   "definitions": {
+    "apiCreateSerialRequestV1": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "title": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "seasons": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
     "apiCreateSerialResponseV1": {
       "type": "object",
       "properties": {
@@ -56,17 +192,17 @@
           "type": "string",
           "format": "uint64"
         },
-        "Title": {
+        "title": {
           "type": "string"
         },
-        "Genre": {
+        "genre": {
           "type": "string"
         },
-        "Year": {
+        "year": {
           "type": "integer",
           "format": "int64"
         },
-        "Seasons": {
+        "seasons": {
           "type": "integer",
           "format": "int64"
         }

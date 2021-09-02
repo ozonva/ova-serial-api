@@ -15,194 +15,194 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// OvaSerialV1Client is the client API for OvaSerialV1 service.
+// OvaSerialClient is the client API for OvaSerial service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type OvaSerialV1Client interface {
-	CreateSerial(ctx context.Context, in *CreateSerialRequestV1, opts ...grpc.CallOption) (*CreateSerialResponseV1, error)
-	GetSerial(ctx context.Context, in *GetSerialRequestV1, opts ...grpc.CallOption) (*GetSerialResponseV1, error)
-	ListSerials(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListSerialsResponseV1, error)
-	RemoveSerial(ctx context.Context, in *RemoveSerialRequestV1, opts ...grpc.CallOption) (*emptypb.Empty, error)
+type OvaSerialClient interface {
+	CreateSerialV1(ctx context.Context, in *CreateSerialRequestV1, opts ...grpc.CallOption) (*CreateSerialResponseV1, error)
+	GetSerialV1(ctx context.Context, in *GetSerialRequestV1, opts ...grpc.CallOption) (*GetSerialResponseV1, error)
+	ListSerialsV1(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListSerialsResponseV1, error)
+	RemoveSerialV1(ctx context.Context, in *RemoveSerialRequestV1, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
-type ovaSerialV1Client struct {
+type ovaSerialClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewOvaSerialV1Client(cc grpc.ClientConnInterface) OvaSerialV1Client {
-	return &ovaSerialV1Client{cc}
+func NewOvaSerialClient(cc grpc.ClientConnInterface) OvaSerialClient {
+	return &ovaSerialClient{cc}
 }
 
-func (c *ovaSerialV1Client) CreateSerial(ctx context.Context, in *CreateSerialRequestV1, opts ...grpc.CallOption) (*CreateSerialResponseV1, error) {
+func (c *ovaSerialClient) CreateSerialV1(ctx context.Context, in *CreateSerialRequestV1, opts ...grpc.CallOption) (*CreateSerialResponseV1, error) {
 	out := new(CreateSerialResponseV1)
-	err := c.cc.Invoke(ctx, "/ova.serial.api.OvaSerialV1/CreateSerial", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ova.serial.api.OvaSerial/CreateSerialV1", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ovaSerialV1Client) GetSerial(ctx context.Context, in *GetSerialRequestV1, opts ...grpc.CallOption) (*GetSerialResponseV1, error) {
+func (c *ovaSerialClient) GetSerialV1(ctx context.Context, in *GetSerialRequestV1, opts ...grpc.CallOption) (*GetSerialResponseV1, error) {
 	out := new(GetSerialResponseV1)
-	err := c.cc.Invoke(ctx, "/ova.serial.api.OvaSerialV1/GetSerial", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ova.serial.api.OvaSerial/GetSerialV1", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ovaSerialV1Client) ListSerials(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListSerialsResponseV1, error) {
+func (c *ovaSerialClient) ListSerialsV1(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListSerialsResponseV1, error) {
 	out := new(ListSerialsResponseV1)
-	err := c.cc.Invoke(ctx, "/ova.serial.api.OvaSerialV1/ListSerials", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ova.serial.api.OvaSerial/ListSerialsV1", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ovaSerialV1Client) RemoveSerial(ctx context.Context, in *RemoveSerialRequestV1, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *ovaSerialClient) RemoveSerialV1(ctx context.Context, in *RemoveSerialRequestV1, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/ova.serial.api.OvaSerialV1/RemoveSerial", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ova.serial.api.OvaSerial/RemoveSerialV1", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// OvaSerialV1Server is the server API for OvaSerialV1 service.
-// All implementations must embed UnimplementedOvaSerialV1Server
+// OvaSerialServer is the server API for OvaSerial service.
+// All implementations must embed UnimplementedOvaSerialServer
 // for forward compatibility
-type OvaSerialV1Server interface {
-	CreateSerial(context.Context, *CreateSerialRequestV1) (*CreateSerialResponseV1, error)
-	GetSerial(context.Context, *GetSerialRequestV1) (*GetSerialResponseV1, error)
-	ListSerials(context.Context, *emptypb.Empty) (*ListSerialsResponseV1, error)
-	RemoveSerial(context.Context, *RemoveSerialRequestV1) (*emptypb.Empty, error)
-	mustEmbedUnimplementedOvaSerialV1Server()
+type OvaSerialServer interface {
+	CreateSerialV1(context.Context, *CreateSerialRequestV1) (*CreateSerialResponseV1, error)
+	GetSerialV1(context.Context, *GetSerialRequestV1) (*GetSerialResponseV1, error)
+	ListSerialsV1(context.Context, *emptypb.Empty) (*ListSerialsResponseV1, error)
+	RemoveSerialV1(context.Context, *RemoveSerialRequestV1) (*emptypb.Empty, error)
+	mustEmbedUnimplementedOvaSerialServer()
 }
 
-// UnimplementedOvaSerialV1Server must be embedded to have forward compatible implementations.
-type UnimplementedOvaSerialV1Server struct {
+// UnimplementedOvaSerialServer must be embedded to have forward compatible implementations.
+type UnimplementedOvaSerialServer struct {
 }
 
-func (UnimplementedOvaSerialV1Server) CreateSerial(context.Context, *CreateSerialRequestV1) (*CreateSerialResponseV1, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateSerial not implemented")
+func (UnimplementedOvaSerialServer) CreateSerialV1(context.Context, *CreateSerialRequestV1) (*CreateSerialResponseV1, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSerialV1 not implemented")
 }
-func (UnimplementedOvaSerialV1Server) GetSerial(context.Context, *GetSerialRequestV1) (*GetSerialResponseV1, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSerial not implemented")
+func (UnimplementedOvaSerialServer) GetSerialV1(context.Context, *GetSerialRequestV1) (*GetSerialResponseV1, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSerialV1 not implemented")
 }
-func (UnimplementedOvaSerialV1Server) ListSerials(context.Context, *emptypb.Empty) (*ListSerialsResponseV1, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListSerials not implemented")
+func (UnimplementedOvaSerialServer) ListSerialsV1(context.Context, *emptypb.Empty) (*ListSerialsResponseV1, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListSerialsV1 not implemented")
 }
-func (UnimplementedOvaSerialV1Server) RemoveSerial(context.Context, *RemoveSerialRequestV1) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RemoveSerial not implemented")
+func (UnimplementedOvaSerialServer) RemoveSerialV1(context.Context, *RemoveSerialRequestV1) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveSerialV1 not implemented")
 }
-func (UnimplementedOvaSerialV1Server) mustEmbedUnimplementedOvaSerialV1Server() {}
+func (UnimplementedOvaSerialServer) mustEmbedUnimplementedOvaSerialServer() {}
 
-// UnsafeOvaSerialV1Server may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to OvaSerialV1Server will
+// UnsafeOvaSerialServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to OvaSerialServer will
 // result in compilation errors.
-type UnsafeOvaSerialV1Server interface {
-	mustEmbedUnimplementedOvaSerialV1Server()
+type UnsafeOvaSerialServer interface {
+	mustEmbedUnimplementedOvaSerialServer()
 }
 
-func RegisterOvaSerialV1Server(s grpc.ServiceRegistrar, srv OvaSerialV1Server) {
-	s.RegisterService(&OvaSerialV1_ServiceDesc, srv)
+func RegisterOvaSerialServer(s grpc.ServiceRegistrar, srv OvaSerialServer) {
+	s.RegisterService(&OvaSerial_ServiceDesc, srv)
 }
 
-func _OvaSerialV1_CreateSerial_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OvaSerial_CreateSerialV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateSerialRequestV1)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OvaSerialV1Server).CreateSerial(ctx, in)
+		return srv.(OvaSerialServer).CreateSerialV1(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ova.serial.api.OvaSerialV1/CreateSerial",
+		FullMethod: "/ova.serial.api.OvaSerial/CreateSerialV1",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OvaSerialV1Server).CreateSerial(ctx, req.(*CreateSerialRequestV1))
+		return srv.(OvaSerialServer).CreateSerialV1(ctx, req.(*CreateSerialRequestV1))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OvaSerialV1_GetSerial_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OvaSerial_GetSerialV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetSerialRequestV1)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OvaSerialV1Server).GetSerial(ctx, in)
+		return srv.(OvaSerialServer).GetSerialV1(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ova.serial.api.OvaSerialV1/GetSerial",
+		FullMethod: "/ova.serial.api.OvaSerial/GetSerialV1",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OvaSerialV1Server).GetSerial(ctx, req.(*GetSerialRequestV1))
+		return srv.(OvaSerialServer).GetSerialV1(ctx, req.(*GetSerialRequestV1))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OvaSerialV1_ListSerials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OvaSerial_ListSerialsV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OvaSerialV1Server).ListSerials(ctx, in)
+		return srv.(OvaSerialServer).ListSerialsV1(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ova.serial.api.OvaSerialV1/ListSerials",
+		FullMethod: "/ova.serial.api.OvaSerial/ListSerialsV1",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OvaSerialV1Server).ListSerials(ctx, req.(*emptypb.Empty))
+		return srv.(OvaSerialServer).ListSerialsV1(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OvaSerialV1_RemoveSerial_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OvaSerial_RemoveSerialV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RemoveSerialRequestV1)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OvaSerialV1Server).RemoveSerial(ctx, in)
+		return srv.(OvaSerialServer).RemoveSerialV1(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ova.serial.api.OvaSerialV1/RemoveSerial",
+		FullMethod: "/ova.serial.api.OvaSerial/RemoveSerialV1",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OvaSerialV1Server).RemoveSerial(ctx, req.(*RemoveSerialRequestV1))
+		return srv.(OvaSerialServer).RemoveSerialV1(ctx, req.(*RemoveSerialRequestV1))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// OvaSerialV1_ServiceDesc is the grpc.ServiceDesc for OvaSerialV1 service.
+// OvaSerial_ServiceDesc is the grpc.ServiceDesc for OvaSerial service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var OvaSerialV1_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ova.serial.api.OvaSerialV1",
-	HandlerType: (*OvaSerialV1Server)(nil),
+var OvaSerial_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ova.serial.api.OvaSerial",
+	HandlerType: (*OvaSerialServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateSerial",
-			Handler:    _OvaSerialV1_CreateSerial_Handler,
+			MethodName: "CreateSerialV1",
+			Handler:    _OvaSerial_CreateSerialV1_Handler,
 		},
 		{
-			MethodName: "GetSerial",
-			Handler:    _OvaSerialV1_GetSerial_Handler,
+			MethodName: "GetSerialV1",
+			Handler:    _OvaSerial_GetSerialV1_Handler,
 		},
 		{
-			MethodName: "ListSerials",
-			Handler:    _OvaSerialV1_ListSerials_Handler,
+			MethodName: "ListSerialsV1",
+			Handler:    _OvaSerial_ListSerialsV1_Handler,
 		},
 		{
-			MethodName: "RemoveSerial",
-			Handler:    _OvaSerialV1_RemoveSerial_Handler,
+			MethodName: "RemoveSerialV1",
+			Handler:    _OvaSerial_RemoveSerialV1_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

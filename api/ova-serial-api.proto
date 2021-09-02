@@ -7,19 +7,36 @@ import "google/protobuf/empty.proto";
 
 option go_package = "github.com/ozonva/ova-serial-api/pkg/ova-serial-api;ova_serial_api";
 
-service OvaSerialV1 {
-  rpc CreateSerial (CreateSerialRequestV1) returns (CreateSerialResponseV1);
-  rpc GetSerial (GetSerialRequestV1) returns (GetSerialResponseV1);
-  rpc ListSerials (google.protobuf.Empty) returns (ListSerialsResponseV1);
-  rpc RemoveSerial (RemoveSerialRequestV1) returns (google.protobuf.Empty);
+service OvaSerial {
+  rpc CreateSerialV1 (CreateSerialRequestV1) returns (CreateSerialResponseV1) {
+    option (google.api.http) = {
+      post: "/v1/serials"
+      body: "*"
+    };
+  }
+  rpc GetSerialV1 (GetSerialRequestV1) returns (GetSerialResponseV1) {
+    option (google.api.http) = {
+      get: "/v1/serials/{id}"
+    };
+  }
+  rpc ListSerialsV1 (google.protobuf.Empty) returns (ListSerialsResponseV1) {
+    option (google.api.http) = {
+      get: "/v1/serials"
+    };
+  }
+  rpc RemoveSerialV1 (RemoveSerialRequestV1) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/serials/{id}"
+    };
+  }
 }
 
 message CreateSerialRequestV1 {
   uint64 user_id = 1;
-  string Title = 2;
-  string Genre = 3;
-  uint32 Year = 4;
-  uint32 Seasons = 5;
+  string title = 2;
+  string genre = 3;
+  uint32 year = 4;
+  uint32 seasons = 5;
 }
 
 message CreateSerialResponseV1 {
@@ -45,8 +62,8 @@ message RemoveSerialRequestV1 {
 message SerialV1 {
   uint64 id = 1;
   uint64 user_id = 2;
-  string Title = 3;
-  string Genre = 4;
-  uint32 Year = 5;
-  uint32 Seasons = 6;
+  string title = 3;
+  string genre = 4;
+  uint32 year = 5;
+  uint32 seasons = 6;
 }

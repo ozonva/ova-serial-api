@@ -1,35 +1,48 @@
 package config
 
 import (
-	"encoding/json"
-	"fmt"
+	"github.com/ghodss/yaml"
+	"github.com/rs/zerolog/log"
+	"io/ioutil"
 	"os"
+	"path/filepath"
+	"sync"
 )
 
 type Config struct {
-	test int
+	Data  interface{}
+	mutex sync.Mutex
 }
 
-func UpdateConfig(path string, config *Config) error {
+func UpdateConfig(path string, config *Config) (ret error) {
+	config.mutex.Lock()
+
 	f, err := os.Open(path)
 	if err != nil {
-		return err
+		ret = err
 	}
 
 	defer func(path string, f *os.File) {
 		err := f.Close()
-		fmt.Printf("Closing file: %s\n", path)
 		if err != nil {
-			fmt.Printf("An error occured: %+v", err)
+			log.Error().Msgf("An error occurred when closing file: %+v", err)
 		}
 	}(path, f)
 
-	decoder := json.NewDecoder(f)
+	defer func() {
+		config.mutex.Unlock()
+	}()
 
-	err = decoder.Decode(config)
+	filename, _ := filepath.Abs(path)
+	yamlFile, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return err
+		ret = err
 	}
 
-	return nil
+	err = yaml.Unmarshal(yamlFile, &config.Data)
+	if err != nil {
+		ret = err
+	}
+
+	return
 }

@@ -2,39 +2,37 @@ package api
 
 import (
 	"context"
-	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"google.golang.org/protobuf/types/known/emptypb"
 	api "ova-serial-api/pkg/ova-serial-api"
 )
 
 type OvaSerialAPI struct {
-	api.UnimplementedOvaSerialV1Server
-	logger *zerolog.Logger
+	api.UnimplementedOvaSerialServer
 }
 
-func NewSerialAPI(logger *zerolog.Logger) api.OvaSerialV1Server {
+func NewSerialAPI() api.OvaSerialServer {
 	return &OvaSerialAPI{
-		UnimplementedOvaSerialV1Server: api.UnimplementedOvaSerialV1Server{},
-		logger:                         logger,
+		UnimplementedOvaSerialServer: api.UnimplementedOvaSerialServer{},
 	}
 }
 
 func (a *OvaSerialAPI) CreateSerialV1(ctx context.Context, req *api.CreateSerialRequestV1) (*api.CreateSerialResponseV1, error) {
-	a.logger.Info().Msgf("CreateSerial request: %v", req)
-	return a.UnimplementedOvaSerialV1Server.CreateSerial(ctx, req)
+	log.Info().Msgf("CreateSerial request: %v", req)
+	return nil, nil
 }
 
 func (a *OvaSerialAPI) GetSerialV1(ctx context.Context, req *api.GetSerialRequestV1) (*api.GetSerialResponseV1, error) {
-	a.logger.Info().Msgf("CreateSerial request: %v", req)
-	return a.UnimplementedOvaSerialV1Server.GetSerial(ctx, req)
+	log.Info().Msgf("CreateSerial request: %v", req)
+	return nil, nil
 }
 
 func (a *OvaSerialAPI) ListSerialsV1(ctx context.Context, empty *emptypb.Empty) (*api.ListSerialsResponseV1, error) {
-	a.logger.Info().Msgf("CreateSerial request: %v", empty)
-	return a.UnimplementedOvaSerialV1Server.ListSerials(ctx, empty)
+	log.Info().Msgf("CreateSerial request: %v", empty)
+	return nil, nil
 }
 
 func (a *OvaSerialAPI) RemoveSerialV1(ctx context.Context, req *api.RemoveSerialRequestV1) (*emptypb.Empty, error) {
-	a.logger.Info().Msgf("CreateSerial request: %v", req)
-	return a.UnimplementedOvaSerialV1Server.RemoveSerial(ctx, req)
+	log.Info().Msgf("CreateSerial request: %v", req)
+	return nil, nil
 }
