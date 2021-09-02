@@ -13,8 +13,8 @@ type Config struct {
 	mutex    sync.Mutex
 }
 
-func NewConfig(filePath string) Config {
-	return Config{
+func NewConfig(filePath string) *Config {
+	return &Config{
 		filePath: filePath,
 	}
 }
