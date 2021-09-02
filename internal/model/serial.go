@@ -3,6 +3,7 @@ package model
 import "fmt"
 
 type Serial struct {
+	ID      uint64
 	UserID  uint64
 	Title   string
 	Genre   string

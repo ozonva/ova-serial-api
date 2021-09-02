@@ -1,0 +1,242 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "ova-serial-api.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "OvaSerial"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/serials": {
+      "get": {
+        "operationId": "OvaSerial_ListSerialsV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiListSerialsResponseV1"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "OvaSerial"
+        ]
+      },
+      "post": {
+        "operationId": "OvaSerial_CreateSerialV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCreateSerialResponseV1"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiCreateSerialRequestV1"
+            }
+          }
+        ],
+        "tags": [
+          "OvaSerial"
+        ]
+      }
+    },
+    "/v1/serials/{id}": {
+      "get": {
+        "operationId": "OvaSerial_GetSerialV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiGetSerialResponseV1"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "OvaSerial"
+        ]
+      },
+      "delete": {
+        "operationId": "OvaSerial_RemoveSerialV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "OvaSerial"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "apiCreateSerialRequestV1": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "title": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "seasons": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "apiCreateSerialResponseV1": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "apiGetSerialResponseV1": {
+      "type": "object",
+      "properties": {
+        "serial": {
+          "$ref": "#/definitions/apiSerialV1"
+        }
+      }
+    },
+    "apiListSerialsResponseV1": {
+      "type": "object",
+      "properties": {
+        "serials": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/apiSerialV1"
+          }
+        }
+      }
+    },
+    "apiSerialV1": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "userId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "title": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "seasons": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

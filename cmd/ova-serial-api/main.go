@@ -1,26 +1,53 @@
 package main
 
 import (
-	"fmt"
+	"github.com/rs/zerolog/log"
+	"google.golang.org/grpc"
+	"net"
+	server "ova-serial-api/internal/api"
 	"ova-serial-api/internal/config"
+	api "ova-serial-api/pkg/ova-serial-api"
 	"time"
 )
 
-const configPath = "config/test_config.json"
-const intervalSec = 10
+const (
+	configPath         = "config/test_config.yaml"
+	confUpdIntervalSec = 10
+	grpcPort           = ":82"
+)
 
 func main() {
-	fmt.Println("ova-serial-api")
+	cfg := config.NewConfig(configPath)
+	go func() {
+		for {
+			err := cfg.Update()
+			if err != nil {
+				log.Error().Msgf("Error while reading config: %s\n", err)
+			} else {
+				log.Debug().Msgf("Config '%s' updated: %+v\n", configPath, cfg.GetData())
+			}
 
-	var cfg config.Config
-	for {
-		err := config.UpdateConfig(configPath, &cfg)
-		if err != nil {
-			fmt.Printf("Error occurred: %s\n", nil)
-		} else {
-			fmt.Printf("Config '%s' updated: %+v\n", configPath, cfg)
+			time.Sleep(confUpdIntervalSec * time.Second)
 		}
+	}()
 
-		time.Sleep(intervalSec * time.Second)
+	if err := startGRPCServer(); err != nil {
+		log.Fatal().Msgf("Error while starting server: %v", err)
 	}
+}
+
+func startGRPCServer() error {
+	listen, err := net.Listen("tcp", grpcPort)
+	if err != nil {
+		log.Fatal().Msgf("failed to listen: %v", err)
+	}
+
+	s := grpc.NewServer()
+	api.RegisterOvaSerialServer(s, server.NewSerialAPI())
+
+	if err := s.Serve(listen); err != nil {
+		log.Fatal().Msgf("failed to serve: %v", err)
+	}
+
+	return nil
 }
