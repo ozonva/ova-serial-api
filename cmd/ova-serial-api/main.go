@@ -1,11 +1,16 @@
 package main
 
 import (
+	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"net"
+	"os"
 	server "ova-serial-api/internal/api"
 	"ova-serial-api/internal/config"
+	"ova-serial-api/internal/repo"
 	api "ova-serial-api/pkg/ova-serial-api"
 	"time"
 )
@@ -43,7 +48,20 @@ func startGRPCServer() error {
 	}
 
 	s := grpc.NewServer()
-	api.RegisterOvaSerialServer(s, server.NewSerialAPI())
+
+	err = godotenv.Load(".env")
+	if err != nil {
+		log.Fatal().Msgf("error while loading config", err)
+	}
+
+	db, err := sqlx.Connect(os.Getenv("DB_DRIVER"), os.Getenv("DB_STRING"))
+	if err != nil {
+		log.Fatal().Msgf("error while establishing sql connection", err)
+	}
+
+	srv := server.NewSerialAPI(repo.NewSerialRepo(db))
+
+	api.RegisterOvaSerialServer(s, srv)
 
 	if err := s.Serve(listen); err != nil {
 		log.Fatal().Msgf("failed to serve: %v", err)

@@ -23,7 +23,7 @@ GOBIN?=$(GOPATH)/bin
 buf.work.yaml:
 	@echo "version: v1\ndirectories:\n  - protos\n  - third_party\n" > $(CURDIR)/buf.work.yaml
 buf.gen.yaml:
-	@echo "version: v1\nplugins:\n  - name: go\n    out: .\n    opt: module=github.com/ozonva/ova-serial-api\n  - name: go\n    out: .\n    opt: module=github.com/ozonva/ova-serial-api\n  - name: go-grpc\n    out: .\n    opt: module=github.com/ozonva/ova-serial-api\n  - name: grpc-gateway\n    out: .\n    opt: logtostderr=true,module=github.com/ozonva/ova-serial-api\n  - name: openapiv2\n    out: swagger\n    opt: allow_merge=true,merge_file_name=api" > $(CURDIR)/buf.gen.yaml
+	@echo "version: v1\nplugins:\n  - name: go\n    out: .\n    opt: module=github.com/ozonva/ova-serial-api\n  - name: go\n    out: .\n    opt: module=github.com/ozonva/ova-serial-api\n  - name: go-grpc\n    out: .\n    opt: module=github.com/ozonva/ova-serial-api\n  - name: grpc-gateway\n    out: .\n    opt: logtostderr=true,module=github.com/ozonva/ova-serial-api\n  - name: validate\n    out: .\n    opt: lang=go,module=github.com/ozonva/ova-serial-api\n  - name: openapiv2\n    out: swagger\n    opt: allow_merge=true,merge_file_name=api" > $(CURDIR)/buf.gen.yaml
 
 .PHONY: generate
 generate: vendor-proto buf.work.yaml buf.gen.yaml
@@ -42,7 +42,7 @@ build: deps
 	go build -o $(CURDIR)/bin/project $(CURDIR)/main.go
 
 go-deps:
-	ls go.mod || go mod init gitlab.com/siriusfreak/lecture-6-demo
+	ls go.mod
 		GOBIN=$(LOCAL_BIN) go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 		GOBIN=$(LOCAL_BIN) go get -u github.com/golang/protobuf/proto
 		GOBIN=$(LOCAL_BIN) go get -u github.com/golang/protobuf/protoc-gen-go
@@ -50,3 +50,4 @@ go-deps:
 		GOBIN=$(LOCAL_BIN) go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
 		GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
 		GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+		GOBIN=$(LOCAL_BIN) go install github.com/envoyproxy/protoc-gen-validate
