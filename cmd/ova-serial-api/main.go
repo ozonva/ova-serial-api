@@ -45,6 +45,7 @@ func startGRPCServer() error {
 	listen, err := net.Listen("tcp", grpcPort)
 	if err != nil {
 		log.Fatal().Msgf("failed to listen: %v", err)
+		return err
 	}
 
 	s := grpc.NewServer()
@@ -52,11 +53,13 @@ func startGRPCServer() error {
 	err = godotenv.Load(".env")
 	if err != nil {
 		log.Fatal().Msgf("error while loading config", err)
+		return err
 	}
 
 	db, err := sqlx.Connect(os.Getenv("DB_DRIVER"), os.Getenv("DB_STRING"))
 	if err != nil {
 		log.Fatal().Msgf("error while establishing sql connection", err)
+		return err
 	}
 
 	srv := server.NewSerialAPI(repo.NewSerialRepo(db))
@@ -65,6 +68,7 @@ func startGRPCServer() error {
 
 	if err := s.Serve(listen); err != nil {
 		log.Fatal().Msgf("failed to serve: %v", err)
+		return err
 	}
 
 	return nil

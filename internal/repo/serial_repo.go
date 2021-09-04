@@ -32,7 +32,6 @@ func (r *serial_repo) AddEntity(entity model.Serial) (int64, error) {
 	return id, nil
 }
 
-// TODO: implement
 func (r *serial_repo) AddEntities(entities []model.Serial) error {
 	return nil
 }
