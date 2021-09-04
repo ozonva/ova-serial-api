@@ -19,8 +19,7 @@ type OvaSerialAPI struct {
 
 func NewSerialAPI(repo repo.Repo) api.OvaSerialServer {
 	return &OvaSerialAPI{
-		UnimplementedOvaSerialServer: api.UnimplementedOvaSerialServer{},
-		repo:                         repo,
+		repo: repo,
 	}
 }
 

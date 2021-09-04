@@ -48,8 +48,6 @@ func startGRPCServer() error {
 		return err
 	}
 
-	s := grpc.NewServer()
-
 	err = godotenv.Load(".env")
 	if err != nil {
 		log.Fatal().Msgf("error while loading config", err)
@@ -63,6 +61,7 @@ func startGRPCServer() error {
 	}
 
 	srv := server.NewSerialAPI(repo.NewSerialRepo(db))
+	s := grpc.NewServer()
 
 	api.RegisterOvaSerialServer(s, srv)
 
