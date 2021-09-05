@@ -12,6 +12,9 @@ plugins:
   - name: grpc-gateway
     out: .
     opt: logtostderr=true,module=github.com/ozonva/ova-serial-api
+  - name: validate
+    out: .
+    opt: lang=go,module=github.com/ozonva/ova-serial-api
   - name: openapiv2
     out: swagger
     opt: allow_merge=true,merge_file_name=api

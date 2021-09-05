@@ -21,7 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 type OvaSerialClient interface {
 	CreateSerialV1(ctx context.Context, in *CreateSerialRequestV1, opts ...grpc.CallOption) (*CreateSerialResponseV1, error)
 	GetSerialV1(ctx context.Context, in *GetSerialRequestV1, opts ...grpc.CallOption) (*GetSerialResponseV1, error)
-	ListSerialsV1(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListSerialsResponseV1, error)
+	ListSerialsV1(ctx context.Context, in *ListSerialsRequestV1, opts ...grpc.CallOption) (*ListSerialsResponseV1, error)
 	RemoveSerialV1(ctx context.Context, in *RemoveSerialRequestV1, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -51,7 +51,7 @@ func (c *ovaSerialClient) GetSerialV1(ctx context.Context, in *GetSerialRequestV
 	return out, nil
 }
 
-func (c *ovaSerialClient) ListSerialsV1(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListSerialsResponseV1, error) {
+func (c *ovaSerialClient) ListSerialsV1(ctx context.Context, in *ListSerialsRequestV1, opts ...grpc.CallOption) (*ListSerialsResponseV1, error) {
 	out := new(ListSerialsResponseV1)
 	err := c.cc.Invoke(ctx, "/ova.serial.api.OvaSerial/ListSerialsV1", in, out, opts...)
 	if err != nil {
@@ -75,7 +75,7 @@ func (c *ovaSerialClient) RemoveSerialV1(ctx context.Context, in *RemoveSerialRe
 type OvaSerialServer interface {
 	CreateSerialV1(context.Context, *CreateSerialRequestV1) (*CreateSerialResponseV1, error)
 	GetSerialV1(context.Context, *GetSerialRequestV1) (*GetSerialResponseV1, error)
-	ListSerialsV1(context.Context, *emptypb.Empty) (*ListSerialsResponseV1, error)
+	ListSerialsV1(context.Context, *ListSerialsRequestV1) (*ListSerialsResponseV1, error)
 	RemoveSerialV1(context.Context, *RemoveSerialRequestV1) (*emptypb.Empty, error)
 	mustEmbedUnimplementedOvaSerialServer()
 }
@@ -90,7 +90,7 @@ func (UnimplementedOvaSerialServer) CreateSerialV1(context.Context, *CreateSeria
 func (UnimplementedOvaSerialServer) GetSerialV1(context.Context, *GetSerialRequestV1) (*GetSerialResponseV1, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSerialV1 not implemented")
 }
-func (UnimplementedOvaSerialServer) ListSerialsV1(context.Context, *emptypb.Empty) (*ListSerialsResponseV1, error) {
+func (UnimplementedOvaSerialServer) ListSerialsV1(context.Context, *ListSerialsRequestV1) (*ListSerialsResponseV1, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListSerialsV1 not implemented")
 }
 func (UnimplementedOvaSerialServer) RemoveSerialV1(context.Context, *RemoveSerialRequestV1) (*emptypb.Empty, error) {
@@ -146,7 +146,7 @@ func _OvaSerial_GetSerialV1_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _OvaSerial_ListSerialsV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(ListSerialsRequestV1)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -158,7 +158,7 @@ func _OvaSerial_ListSerialsV1_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: "/ova.serial.api.OvaSerial/ListSerialsV1",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OvaSerialServer).ListSerialsV1(ctx, req.(*emptypb.Empty))
+		return srv.(OvaSerialServer).ListSerialsV1(ctx, req.(*ListSerialsRequestV1))
 	}
 	return interceptor(ctx, in, info, handler)
 }

@@ -12,8 +12,8 @@ func InvertStrIntMap(mapToInvert map[string]int) map[int]string {
 	return newMap
 }
 
-func SerialSliceToMap(serials []model.Serial) map[uint64]model.Serial {
-	newMap := make(map[uint64]model.Serial, len(serials))
+func SerialSliceToMap(serials []model.Serial) map[int64]model.Serial {
+	newMap := make(map[int64]model.Serial, len(serials))
 	for _, serial := range serials {
 		newMap[serial.UserID] = serial
 	}

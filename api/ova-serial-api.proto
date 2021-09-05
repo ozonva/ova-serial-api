@@ -19,7 +19,7 @@ service OvaSerial {
       get: "/v1/serials/{id}"
     };
   }
-  rpc ListSerialsV1 (google.protobuf.Empty) returns (ListSerialsResponseV1) {
+  rpc ListSerialsV1 (ListSerialsRequestV1) returns (ListSerialsResponseV1) {
     option (google.api.http) = {
       get: "/v1/serials"
     };
@@ -32,7 +32,7 @@ service OvaSerial {
 }
 
 message CreateSerialRequestV1 {
-  uint64 user_id = 1;
+  int64 user_id = 1;
   string title = 2;
   string genre = 3;
   uint32 year = 4;
@@ -40,15 +40,20 @@ message CreateSerialRequestV1 {
 }
 
 message CreateSerialResponseV1 {
-  uint64 id = 1;
+  int64 id = 1;
 }
 
 message GetSerialRequestV1 {
-  uint64 id = 1;
+  int64 id = 1;
 }
 
 message GetSerialResponseV1 {
   SerialV1 serial = 1;
+}
+
+message ListSerialsRequestV1 {
+  uint64 limit = 1;
+  uint64 offset = 2;
 }
 
 message ListSerialsResponseV1 {
@@ -56,12 +61,12 @@ message ListSerialsResponseV1 {
 }
 
 message RemoveSerialRequestV1 {
-  uint64 id = 1;
+  int64 id = 1;
 }
 
 message SerialV1 {
-  uint64 id = 1;
-  uint64 user_id = 2;
+  int64 id = 1;
+  int64 user_id = 2;
   string title = 3;
   string genre = 4;
   uint32 year = 5;

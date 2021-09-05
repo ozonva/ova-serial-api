@@ -3,12 +3,12 @@ package model
 import "fmt"
 
 type Serial struct {
-	ID      uint64
-	UserID  uint64
-	Title   string
-	Genre   string
-	Year    uint32
-	Seasons uint32
+	ID      int64  `db:"id"`
+	UserID  int64  `db:"user_id"`
+	Title   string `db:"title"`
+	Genre   string `db:"genre"`
+	Year    uint32 `db:"year"`
+	Seasons uint32 `db:"seasons"`
 }
 
 func (s Serial) String() string {
