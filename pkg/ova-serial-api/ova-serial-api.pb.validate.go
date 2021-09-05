@@ -547,6 +547,83 @@ var _ interface {
 	ErrorName() string
 } = RemoveSerialRequestV1ValidationError{}
 
+// Validate checks the field values on UpdateSerialRequestV1 with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpdateSerialRequestV1) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetSerial()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateSerialRequestV1ValidationError{
+				field:  "Serial",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// UpdateSerialRequestV1ValidationError is the validation error returned by
+// UpdateSerialRequestV1.Validate if the designated constraints aren't met.
+type UpdateSerialRequestV1ValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateSerialRequestV1ValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateSerialRequestV1ValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateSerialRequestV1ValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateSerialRequestV1ValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateSerialRequestV1ValidationError) ErrorName() string {
+	return "UpdateSerialRequestV1ValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateSerialRequestV1ValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateSerialRequestV1.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateSerialRequestV1ValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateSerialRequestV1ValidationError{}
+
 // Validate checks the field values on SerialV1 with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *SerialV1) Validate() error {

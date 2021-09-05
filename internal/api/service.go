@@ -126,6 +126,37 @@ func (a *OvaSerialAPI) RemoveSerialV1(ctx context.Context, req *api.RemoveSerial
 	return &emptypb.Empty{}, nil
 }
 
+func (a *OvaSerialAPI) UpdateSerialV1(ctx context.Context, req *api.UpdateSerialRequestV1) (*emptypb.Empty, error) {
+	if err := req.Validate(); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	log.Debug().
+		Int64("Id", req.Serial.Id).
+		Int64("UserId", req.Serial.UserId).
+		Str("Title", req.Serial.Title).
+		Str("Genre", req.Serial.Genre).
+		Uint32("Year", req.Serial.Year).
+		Uint32("Seasons", req.Serial.Seasons).
+		Msg("Update serial")
+
+	serial := model.Serial{
+		ID:      req.Serial.Id,
+		UserID:  req.Serial.UserId,
+		Title:   req.Serial.Title,
+		Genre:   req.Serial.Genre,
+		Year:    req.Serial.Year,
+		Seasons: req.Serial.Seasons,
+	}
+
+	err := a.repo.UpdateEntity(serial)
+	if err != nil {
+		return nil, getErrorText(err)
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
 func getErrorText(err error) error {
 	if errors.Is(err, &repo.NotFound{}) {
 		return status.Error(codes.NotFound, "not found")

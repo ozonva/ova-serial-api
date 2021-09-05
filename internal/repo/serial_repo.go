@@ -75,10 +75,10 @@ func (r *serial_repo) RemoveEntity(entityID int64) error {
 	return nil
 }
 
-func (r *serial_repo) UpdateEntity(entityID int64, entity model.Serial) error {
-	res, err := r.db.NamedExec(`UPDATE serial SET user_id=:user_id, title=:title, genre=:genre, year =:year, seasons=:seasons, where id=:id`,
+func (r *serial_repo) UpdateEntity(entity model.Serial) error {
+	res, err := r.db.NamedExec(`UPDATE serial SET user_id=:user_id, title=:title, genre=:genre, year =:year, seasons=:seasons WHERE id=:id`,
 		map[string]interface{}{
-			"id":      entityID,
+			"id":      entity.ID,
 			"user_id": entity.UserID,
 			"title":   entity.Title,
 			"genre":   entity.Genre,

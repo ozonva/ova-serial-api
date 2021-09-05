@@ -61,6 +61,16 @@ func startGRPCServer() error {
 	}
 
 	srv := server.NewSerialAPI(repo.NewSerialRepo(db))
+	_, _ = srv.UpdateSerialV1(nil, &api.UpdateSerialRequestV1{
+		Serial: &api.SerialV1{
+			Id:      21,
+			UserId:  1,
+			Title:   "DEADBEEF",
+			Genre:   "DEADBEEF",
+			Year:    2021,
+			Seasons: 10,
+		},
+	})
 	s := grpc.NewServer()
 
 	api.RegisterOvaSerialServer(s, srv)
