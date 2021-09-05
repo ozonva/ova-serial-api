@@ -35,14 +35,14 @@
         },
         "parameters": [
           {
-            "name": "Limit",
+            "name": "limit",
             "in": "query",
             "required": false,
             "type": "string",
             "format": "uint64"
           },
           {
-            "name": "Offset",
+            "name": "offset",
             "in": "query",
             "required": false,
             "type": "string",

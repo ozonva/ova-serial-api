@@ -11,6 +11,8 @@ type serial_repo struct {
 	db sqlx.DB
 }
 
+const TABLE_NAME = "serial"
+
 func NewSerialRepo(db *sqlx.DB) Repo {
 	return &serial_repo{db: *db}
 }
@@ -50,7 +52,7 @@ func (r *serial_repo) GetEntity(entityID int64) (*model.Serial, error) {
 	serial := model.Serial{}
 	err := r.db.Get(&serial, "SELECT id, user_id, title, genre, year, seasons FROM serial WHERE id=$1", entityID)
 	if err != nil {
-		return nil, getError(err)
+		return nil, getError(err, "get", entityID)
 	}
 
 	return &serial, nil
@@ -69,15 +71,23 @@ func (r *serial_repo) RemoveEntity(entityID int64) error {
 	}
 
 	if count == 0 {
-		return &NotFound{}
+		return &NotFound{
+			Operation: "remove",
+			Table:     TABLE_NAME,
+			Id:        entityID,
+		}
 	}
 
 	return nil
 }
 
-func getError(err error) error {
+func getError(err error, operation string, id int64) error {
 	if errors.Is(err, sql.ErrNoRows) {
-		return &NotFound{}
+		return &NotFound{
+			Operation: operation,
+			Table:     TABLE_NAME,
+			Id:        id,
+		}
 	}
 
 	return err

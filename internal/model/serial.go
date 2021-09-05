@@ -3,7 +3,7 @@ package model
 import "fmt"
 
 type Serial struct {
-	ID      int64
+	ID      int64  `db:"id"`
 	UserID  int64  `db:"user_id"`
 	Title   string `db:"title"`
 	Genre   string `db:"genre"`

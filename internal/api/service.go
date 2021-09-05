@@ -28,14 +28,6 @@ func (a *OvaSerialAPI) CreateSerialV1(ctx context.Context, req *api.CreateSerial
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	log.Debug().
-		Int64("UserId", req.UserId).
-		Str("Title", req.Title).
-		Str("Genre", req.Genre).
-		Uint32("Year", req.Year).
-		Uint32("Seasons", req.Seasons).
-		Msg("Create serial")
-
 	serial := model.Serial{
 		UserID:  req.UserId,
 		Title:   req.Title,
@@ -44,8 +36,11 @@ func (a *OvaSerialAPI) CreateSerialV1(ctx context.Context, req *api.CreateSerial
 		Seasons: req.Seasons,
 	}
 
+	log.Debug().Msgf("Create serial: %+v", serial)
+
 	id, err := a.repo.AddEntity(serial)
 	if err != nil {
+		log.Error().Msgf("Error occurred while creating serial: %+v", err)
 		return nil, getErrorText(err)
 	}
 
@@ -59,12 +54,11 @@ func (a *OvaSerialAPI) GetSerialV1(ctx context.Context, req *api.GetSerialReques
 		return nil, getErrorText(err)
 	}
 
-	log.Debug().
-		Int64("Id", req.Id).
-		Msg("Get serial")
+	log.Debug().Msgf("Get serial with Id %d", req.Id)
 
 	serial, err := a.repo.GetEntity(req.Id)
 	if err != nil {
+		log.Error().Msgf("Error occurred while getting serial with Id %d: %+v", req.Id, err)
 		return nil, getErrorText(err)
 	}
 
@@ -81,13 +75,11 @@ func (a *OvaSerialAPI) GetSerialV1(ctx context.Context, req *api.GetSerialReques
 }
 
 func (a *OvaSerialAPI) ListSerialsV1(ctx context.Context, req *api.ListSerialsRequestV1) (*api.ListSerialsResponseV1, error) {
-	log.Debug().
-		Uint64("Limit", req.Limit).
-		Uint64("Offset", req.Offset).
-		Msg("List serials")
+	log.Debug().Msgf("List serials with limit %d and offset %d", req.Limit, req.Offset)
 
 	fetched, err := a.repo.ListEntities(req.Limit, req.Offset)
 	if err != nil {
+		log.Error().Msgf("Error occurred while getting serials with limit %d and offset %d: %+v", req.Limit, req.Offset, err)
 		return nil, getErrorText(err)
 	}
 
@@ -114,12 +106,11 @@ func (a *OvaSerialAPI) RemoveSerialV1(ctx context.Context, req *api.RemoveSerial
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	log.Debug().
-		Int64("Id", req.Id).
-		Msg("Remove serial")
+	log.Debug().Msgf("Remove serial with Id: %d", req.Id)
 
 	err := a.repo.RemoveEntity(req.Id)
 	if err != nil {
+		log.Error().Msgf("Error occurred while removing serial with Id %d: %+v", req.Id, err)
 		return nil, getErrorText(err)
 	}
 
@@ -130,5 +121,5 @@ func getErrorText(err error) error {
 	if errors.Is(err, &repo.NotFound{}) {
 		return status.Error(codes.NotFound, "not found")
 	}
-	return status.Error(codes.Internal, "internal error")
+	return status.Errorf(codes.Internal, "internal error: %+v", err)
 }
