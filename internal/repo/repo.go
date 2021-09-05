@@ -10,4 +10,5 @@ type Repo interface {
 	ListEntities(limit, offset uint64) ([]model.Serial, error)
 	GetEntity(entityId int64) (*model.Serial, error)
 	RemoveEntity(entityId int64) error
+	UpdateEntity(entityID int64, entity model.Serial) error
 }

@@ -75,6 +75,33 @@ func (r *serial_repo) RemoveEntity(entityID int64) error {
 	return nil
 }
 
+func (r *serial_repo) UpdateEntity(entityID int64, entity model.Serial) error {
+	res, err := r.db.NamedExec(`UPDATE serial SET user_id=:user_id, title=:title, genre=:genre, year =:year, seasons=:seasons, where id=:id`,
+		map[string]interface{}{
+			"id":      entityID,
+			"user_id": entity.UserID,
+			"title":   entity.Title,
+			"genre":   entity.Genre,
+			"year":    entity.Year,
+			"seasons": entity.Seasons,
+		})
+
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return &NotFound{}
+	}
+
+	return nil
+}
+
 func getError(err error) error {
 	if errors.Is(err, sql.ErrNoRows) {
 		return &NotFound{}

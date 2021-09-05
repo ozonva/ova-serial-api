@@ -29,6 +29,11 @@ service OvaSerial {
       delete: "/v1/serials/{id}"
     };
   }
+  rpc UpdateSerialV1 (UpdateSerialRequestV1) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/v1/serials/{id}"
+    };
+  }
 }
 
 message CreateSerialRequestV1 {
@@ -62,6 +67,10 @@ message ListSerialsResponseV1 {
 
 message RemoveSerialRequestV1 {
   int64 id = 1;
+}
+
+message UpdateSerialRequestV1 {
+  SerialV1 serial = 1;
 }
 
 message SerialV1 {
