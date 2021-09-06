@@ -3,29 +3,76 @@ package api
 import (
 	"context"
 	"errors"
+	"github.com/opentracing/opentracing-go"
+	opentracingLog "github.com/opentracing/opentracing-go/log"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	kafka_client "ova-serial-api/internal/kafka"
 	"ova-serial-api/internal/model"
 	"ova-serial-api/internal/repo"
+	"ova-serial-api/internal/utils"
 	api "ova-serial-api/pkg/ova-serial-api"
+	"strconv"
 )
 
 type OvaSerialAPI struct {
 	api.UnimplementedOvaSerialServer
-	repo repo.Repo
+	repo        repo.Repo
+	kafkaClient kafka_client.Client
+	metrics     Metrics
 }
 
-func NewSerialAPI(repo repo.Repo) api.OvaSerialServer {
+const BATCH_SIZE = 2
+
+func NewSerialAPI(repo repo.Repo, kafkaClient kafka_client.Client) api.OvaSerialServer {
 	return &OvaSerialAPI{
-		repo: repo,
+		repo:        repo,
+		kafkaClient: kafkaClient,
+		metrics:     newApiMetrics(),
 	}
 }
 
-func (a *OvaSerialAPI) CreateSerialV1(ctx context.Context, req *api.CreateSerialRequestV1) (*api.CreateSerialResponseV1, error) {
+type cudEvent uint8
+
+const (
+	createEvent cudEvent = iota
+	updateEvent
+	deleteEvent
+)
+
+func (s *OvaSerialAPI) sendKafkaCUDEvent(event cudEvent) error {
+	return s.kafkaClient.SendMessage([]byte(strconv.Itoa(int(event))))
+}
+
+func (s *OvaSerialAPI) sendKafkaCreateEvent() error {
+	return s.sendKafkaCUDEvent(createEvent)
+}
+
+func (s *OvaSerialAPI) sendKafkaUpdateEvent() error {
+	return s.sendKafkaCUDEvent(updateEvent)
+}
+
+func (s *OvaSerialAPI) sendKafkaDeleteEvent() error {
+	return s.sendKafkaCUDEvent(deleteEvent)
+}
+
+func (a *OvaSerialAPI) CreateSerialV1(ctx context.Context, req *api.CreateSerialRequestV1) (res *api.CreateSerialResponseV1, err error) {
+	defer func() {
+		if err != nil {
+			a.metrics.incFailCreateSerialCounter()
+		} else {
+			a.metrics.incSuccessCreateSerialCounter()
+		}
+	}()
+
 	if err := req.Validate(); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if sendError := a.sendKafkaCreateEvent(); sendError != nil {
+		log.Error().Msgf("Can not send create event to kafka, error: %s", sendError)
 	}
 
 	serial := model.Serial{
@@ -36,7 +83,7 @@ func (a *OvaSerialAPI) CreateSerialV1(ctx context.Context, req *api.CreateSerial
 		Seasons: req.Seasons,
 	}
 
-	log.Debug().Msgf("Create serial: %+v", serial)
+	log.Info().Msgf("Create serial: %+v", serial)
 
 	id, err := a.repo.AddEntity(serial)
 	if err != nil {
@@ -49,12 +96,56 @@ func (a *OvaSerialAPI) CreateSerialV1(ctx context.Context, req *api.CreateSerial
 	}, nil
 }
 
+func (a *OvaSerialAPI) MultiCreateSerialV1(ctx context.Context, req *api.MultiCreateSerialRequestV1) (*emptypb.Empty, error) {
+	if err := req.Validate(); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	log.Info().Msgf("Multi create %d serials", len(req.Serials))
+
+	serials := make([]model.Serial, 0, len(req.Serials))
+	for _, s := range req.Serials {
+		serials = append(serials, model.Serial{
+			ID:      s.Id,
+			UserID:  s.UserId,
+			Title:   s.Title,
+			Genre:   s.Genre,
+			Year:    s.Year,
+			Seasons: s.Seasons,
+		})
+	}
+
+	span := opentracing.StartSpan("MultiCreateSerials")
+	span.LogFields(opentracingLog.Int("Total serials count", len(serials)))
+	defer span.Finish()
+
+	for _, serialsSlice := range utils.SplitSerialSlice(serials, BATCH_SIZE) {
+		if err := a.batchCreate(span, serialsSlice); err != nil {
+			return nil, err
+		}
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (a *OvaSerialAPI) batchCreate(parentSpan opentracing.Span, serialsSlice []model.Serial) error {
+	span := opentracing.StartSpan("MultiCreateSerialsBatch", opentracing.ChildOf(parentSpan.Context()))
+	span.LogFields(opentracingLog.Int("Serials count", len(serialsSlice)))
+	defer span.Finish()
+
+	if err := a.repo.AddEntities(serialsSlice); err != nil {
+		log.Error().Msgf("Error occurred while creating serials: %+v", err)
+		return err
+	}
+	return nil
+}
+
 func (a *OvaSerialAPI) GetSerialV1(ctx context.Context, req *api.GetSerialRequestV1) (*api.GetSerialResponseV1, error) {
 	if err := req.Validate(); err != nil {
 		return nil, getErrorText(err)
 	}
 
-	log.Debug().Msgf("Get serial with Id %d", req.Id)
+	log.Info().Msgf("Get serial with Id %d", req.Id)
 
 	serial, err := a.repo.GetEntity(req.Id)
 	if err != nil {
@@ -75,7 +166,7 @@ func (a *OvaSerialAPI) GetSerialV1(ctx context.Context, req *api.GetSerialReques
 }
 
 func (a *OvaSerialAPI) ListSerialsV1(ctx context.Context, req *api.ListSerialsRequestV1) (*api.ListSerialsResponseV1, error) {
-	log.Debug().Msgf("List serials with limit %d and offset %d", req.Limit, req.Offset)
+	log.Info().Msgf("List serials with limit %d and offset %d", req.Limit, req.Offset)
 
 	fetched, err := a.repo.ListEntities(req.Limit, req.Offset)
 	if err != nil {
@@ -101,14 +192,26 @@ func (a *OvaSerialAPI) ListSerialsV1(ctx context.Context, req *api.ListSerialsRe
 	}, nil
 }
 
-func (a *OvaSerialAPI) RemoveSerialV1(ctx context.Context, req *api.RemoveSerialRequestV1) (*emptypb.Empty, error) {
+func (a *OvaSerialAPI) RemoveSerialV1(ctx context.Context, req *api.RemoveSerialRequestV1) (e *emptypb.Empty, err error) {
+	defer func() {
+		if err != nil {
+			a.metrics.incFailRemoveSerialCounter()
+		} else {
+			a.metrics.incSuccessRemoveSerialCounter()
+		}
+	}()
+
 	if err := req.Validate(); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	log.Debug().Msgf("Remove serial with Id: %d", req.Id)
+	if err = a.sendKafkaDeleteEvent(); err != nil {
+		log.Error().Msgf("Error sending remove event to kafka, error: %s", err)
+	}
 
-	err := a.repo.RemoveEntity(req.Id)
+	log.Info().Msgf("Remove serial with Id: %d", req.Id)
+
+	err = a.repo.RemoveEntity(req.Id)
 	if err != nil {
 		log.Error().Msgf("Error occurred while removing serial with Id %d: %+v", req.Id, err)
 		return nil, getErrorText(err)
@@ -117,9 +220,21 @@ func (a *OvaSerialAPI) RemoveSerialV1(ctx context.Context, req *api.RemoveSerial
 	return &emptypb.Empty{}, nil
 }
 
-func (a *OvaSerialAPI) UpdateSerialV1(ctx context.Context, req *api.UpdateSerialRequestV1) (*emptypb.Empty, error) {
+func (a *OvaSerialAPI) UpdateSerialV1(ctx context.Context, req *api.UpdateSerialRequestV1) (e *emptypb.Empty, err error) {
+	defer func() {
+		if err != nil {
+			a.metrics.incFailUpdateSerialCounter()
+		} else {
+			a.metrics.incSuccessUpdateSerialCounter()
+		}
+	}()
+
 	if err := req.Validate(); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if err = a.sendKafkaUpdateEvent(); err != nil {
+		log.Error().Msgf("Error sending update event to kafka, error: %s", err)
 	}
 
 	serial := model.Serial{
@@ -131,9 +246,9 @@ func (a *OvaSerialAPI) UpdateSerialV1(ctx context.Context, req *api.UpdateSerial
 		Seasons: req.Serial.Seasons,
 	}
 
-	log.Debug().Msgf("Update serial: %+v", serial)
+	log.Info().Msgf("Update serial: %+v", serial)
 
-	err := a.repo.UpdateEntity(serial)
+	err = a.repo.UpdateEntity(serial)
 	if err != nil {
 		log.Error().Msgf("Error occurred while updating serial with Id %d: %+v", req.Serial.Id, err)
 		return nil, getErrorText(err)

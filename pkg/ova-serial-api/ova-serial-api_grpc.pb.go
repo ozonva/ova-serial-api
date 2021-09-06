@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OvaSerialClient interface {
 	CreateSerialV1(ctx context.Context, in *CreateSerialRequestV1, opts ...grpc.CallOption) (*CreateSerialResponseV1, error)
+	MultiCreateSerialV1(ctx context.Context, in *MultiCreateSerialRequestV1, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetSerialV1(ctx context.Context, in *GetSerialRequestV1, opts ...grpc.CallOption) (*GetSerialResponseV1, error)
 	ListSerialsV1(ctx context.Context, in *ListSerialsRequestV1, opts ...grpc.CallOption) (*ListSerialsResponseV1, error)
 	RemoveSerialV1(ctx context.Context, in *RemoveSerialRequestV1, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -37,6 +38,15 @@ func NewOvaSerialClient(cc grpc.ClientConnInterface) OvaSerialClient {
 func (c *ovaSerialClient) CreateSerialV1(ctx context.Context, in *CreateSerialRequestV1, opts ...grpc.CallOption) (*CreateSerialResponseV1, error) {
 	out := new(CreateSerialResponseV1)
 	err := c.cc.Invoke(ctx, "/ova.serial.api.OvaSerial/CreateSerialV1", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ovaSerialClient) MultiCreateSerialV1(ctx context.Context, in *MultiCreateSerialRequestV1, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/ova.serial.api.OvaSerial/MultiCreateSerialV1", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -84,6 +94,7 @@ func (c *ovaSerialClient) UpdateSerialV1(ctx context.Context, in *UpdateSerialRe
 // for forward compatibility
 type OvaSerialServer interface {
 	CreateSerialV1(context.Context, *CreateSerialRequestV1) (*CreateSerialResponseV1, error)
+	MultiCreateSerialV1(context.Context, *MultiCreateSerialRequestV1) (*emptypb.Empty, error)
 	GetSerialV1(context.Context, *GetSerialRequestV1) (*GetSerialResponseV1, error)
 	ListSerialsV1(context.Context, *ListSerialsRequestV1) (*ListSerialsResponseV1, error)
 	RemoveSerialV1(context.Context, *RemoveSerialRequestV1) (*emptypb.Empty, error)
@@ -97,6 +108,9 @@ type UnimplementedOvaSerialServer struct {
 
 func (UnimplementedOvaSerialServer) CreateSerialV1(context.Context, *CreateSerialRequestV1) (*CreateSerialResponseV1, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSerialV1 not implemented")
+}
+func (UnimplementedOvaSerialServer) MultiCreateSerialV1(context.Context, *MultiCreateSerialRequestV1) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MultiCreateSerialV1 not implemented")
 }
 func (UnimplementedOvaSerialServer) GetSerialV1(context.Context, *GetSerialRequestV1) (*GetSerialResponseV1, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSerialV1 not implemented")
@@ -137,6 +151,24 @@ func _OvaSerial_CreateSerialV1_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(OvaSerialServer).CreateSerialV1(ctx, req.(*CreateSerialRequestV1))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OvaSerial_MultiCreateSerialV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MultiCreateSerialRequestV1)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OvaSerialServer).MultiCreateSerialV1(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ova.serial.api.OvaSerial/MultiCreateSerialV1",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OvaSerialServer).MultiCreateSerialV1(ctx, req.(*MultiCreateSerialRequestV1))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -223,6 +255,10 @@ var OvaSerial_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateSerialV1",
 			Handler:    _OvaSerial_CreateSerialV1_Handler,
+		},
+		{
+			MethodName: "MultiCreateSerialV1",
+			Handler:    _OvaSerial_MultiCreateSerialV1_Handler,
 		},
 		{
 			MethodName: "GetSerialV1",

@@ -14,6 +14,12 @@ service OvaSerial {
       body: "*"
     };
   }
+  rpc MultiCreateSerialV1 (MultiCreateSerialRequestV1) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/serials"
+      body: "*"
+    };
+  }
   rpc GetSerialV1 (GetSerialRequestV1) returns (GetSerialResponseV1) {
     option (google.api.http) = {
       get: "/v1/serials/{id}"
@@ -50,6 +56,10 @@ message CreateSerialResponseV1 {
 
 message GetSerialRequestV1 {
   int64 id = 1;
+}
+
+message MultiCreateSerialRequestV1 {
+  repeated SerialV1 serials = 1;
 }
 
 message GetSerialResponseV1 {

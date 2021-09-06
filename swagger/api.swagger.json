@@ -54,12 +54,12 @@
         ]
       },
       "post": {
-        "operationId": "OvaSerial_CreateSerialV1",
+        "operationId": "OvaSerial_MultiCreateSerialV1",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/apiCreateSerialResponseV1"
+              "properties": {}
             }
           },
           "default": {
@@ -75,7 +75,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/apiCreateSerialRequestV1"
+              "$ref": "#/definitions/apiMultiCreateSerialRequestV1"
             }
           }
         ],
@@ -218,6 +218,17 @@
       }
     },
     "apiListSerialsResponseV1": {
+      "type": "object",
+      "properties": {
+        "serials": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/apiSerialV1"
+          }
+        }
+      }
+    },
+    "apiMultiCreateSerialRequestV1": {
       "type": "object",
       "properties": {
         "serials": {

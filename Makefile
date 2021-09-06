@@ -69,3 +69,7 @@ go-deps:
 		GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
 		GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 		GOBIN=$(LOCAL_BIN) go install github.com/envoyproxy/protoc-gen-validate
+		GOBIN=$(LOCAL_BIN) go install github.com/opentracing/opentracing-go/log
+		GOBIN=$(LOCAL_BIN) go install github.com/segmentio/kafka-go
+		GOBIN=$(LOCAL_BIN) go install github.com/prometheus/client_golang/prometheus
+		GOBIN=$(LOCAL_BIN) go install github.com/prometheus/client_golang/prometheus/promauto

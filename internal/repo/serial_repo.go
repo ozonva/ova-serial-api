@@ -20,7 +20,9 @@ func NewSerialRepo(db *sqlx.DB) Repo {
 
 func (r *serial_repo) AddEntity(entity model.Serial) (int64, error) {
 	var id int64
-	query, err := r.db.PrepareNamed(fmt.Sprintf("INSERT INTO %s (user_id,title,genre,year,seasons) VALUES (:user_id,:title,:genre,:year,:seasons) RETURNING id", TABLE_NAME))
+	query, err := r.db.PrepareNamed(fmt.Sprintf(
+		"INSERT INTO %s (user_id,title,genre,year,seasons) VALUES (:user_id,:title,:genre,:year,:seasons) RETURNING id", TABLE_NAME,
+	))
 
 	if err != nil {
 		return 0, err
@@ -36,7 +38,25 @@ func (r *serial_repo) AddEntity(entity model.Serial) (int64, error) {
 }
 
 func (r *serial_repo) AddEntities(entities []model.Serial) error {
-	return nil
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	stmt, err := tx.Prepare(fmt.Sprintf(
+		"INSERT INTO %s (user_id,title,genre,year,seasons) VALUES ($1, $2, $3, $4, $5) RETURNING id", TABLE_NAME,
+	))
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	for _, serial := range entities {
+		_, execErr := stmt.Exec(serial.UserID, serial.Title, serial.Genre, serial.Year, serial.Seasons)
+		if execErr != nil {
+			return execErr
+		}
+	}
+	return tx.Commit()
 }
 
 func (r *serial_repo) ListEntities(limit, offset uint64) ([]model.Serial, error) {
