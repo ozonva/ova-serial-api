@@ -75,17 +75,6 @@ services:
     networks:
       - ozonva
 
-  prometheus:
-    image: prom/prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - 9090:9090/tcp
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-    networks:
-      - ozonva
-
 networks:
   ozonva:
     driver: bridge

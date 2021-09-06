@@ -42,7 +42,7 @@ func newApiMetrics() Metrics {
 			labels),
 		updateSerialCounter: promauto.NewCounterVec(prometheus.CounterOpts{
 			Name: "update_serial_request_count",
-			Help: "number of removed serials",
+			Help: "number of updated serials",
 		},
 			labels),
 	}

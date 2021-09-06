@@ -1,16 +1,17 @@
 package kafka_client
 
 import (
+	"bytes"
 	"context"
 	"github.com/segmentio/kafka-go"
 )
 
 type Client interface {
 	Connect(ctx context.Context, dsn string, topic string, partition int) error
-	SendMessage(message []byte) error
+	SendMessage(message string) error
 }
 
-func New() Client {
+func NewKafkaClient() Client {
 	return &client{}
 }
 
@@ -27,7 +28,7 @@ func (c *client) Connect(ctx context.Context, dsn string, topic string, partitio
 	return nil
 }
 
-func (c *client) SendMessage(message []byte) error {
-	_, err := c.conn.Write(message)
+func (c *client) SendMessage(message string) error {
+	_, err := c.conn.Write(bytes.NewBufferString(message).Bytes())
 	return err
 }

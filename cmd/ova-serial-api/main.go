@@ -30,6 +30,8 @@ const (
 	configPath         = "config/test_config.yaml"
 	confUpdIntervalSec = 10
 	grpcPort           = ":82"
+	serviceName        = "ova-serial-api"
+	kafkaTopic         = "serial-CUD-events"
 )
 
 func main() {
@@ -39,10 +41,7 @@ func main() {
 			err := cfg.Update()
 			if err != nil {
 				log.Error().Msgf("Error while reading config: %s\n", err)
-			} else {
-				//log.Debug().Msgf("Config '%s' updated: %+v\n", configPath, cfg.GetData())
 			}
-
 			time.Sleep(confUpdIntervalSec * time.Second)
 		}
 	}()
@@ -67,7 +66,7 @@ func runPrometheusMetrics() {
 
 func initTracer() (opentracing.Tracer, io.Closer) {
 	cfg := jaegercfg.Configuration{
-		ServiceName: "ova-serial-api",
+		ServiceName: serviceName,
 		Sampler: &jaegercfg.SamplerConfig{
 			Type:  jaeger.SamplerTypeConst,
 			Param: 1,
@@ -109,64 +108,13 @@ func startGRPCServer() error {
 		return err
 	}
 
-	kafkaClient := kafka_client.New()
+	kafkaClient := kafka_client.NewKafkaClient()
 	kafkaDsn := fmt.Sprintf("%s:%s", os.Getenv("KAFKA_HOST"), os.Getenv("KAFKA_PORT"))
-	if kafkaConnErr := kafkaClient.Connect(context.Background(), kafkaDsn, "CUDEvents", 0); kafkaConnErr != nil {
+	if kafkaConnErr := kafkaClient.Connect(context.Background(), kafkaDsn, kafkaTopic, 0); kafkaConnErr != nil {
 		log.Fatal().Msgf("Error connecting to kafka, %s", kafkaConnErr)
 	}
 
 	srv := server.NewSerialAPI(repo.NewSerialRepo(db), kafkaClient)
-	_, _ = srv.MultiCreateSerialV1(context.TODO(), &api.MultiCreateSerialRequestV1{
-		Serials: []*api.SerialV1{
-			{
-				Id:      11,
-				UserId:  11,
-				Title:   "11abc",
-				Genre:   "DEADBEEF",
-				Year:    2011,
-				Seasons: 11,
-			},
-			{
-				Id:      12,
-				UserId:  12,
-				Title:   "12abc",
-				Genre:   "DEADBEEF",
-				Year:    2012,
-				Seasons: 12,
-			},
-			{
-				Id:      13,
-				UserId:  13,
-				Title:   "13abc",
-				Genre:   "DEADBEEF",
-				Year:    2013,
-				Seasons: 13,
-			},
-		},
-	})
-
-	srv.CreateSerialV1(nil, &api.CreateSerialRequestV1{
-		UserId:  0,
-		Title:   "",
-		Genre:   "",
-		Year:    0,
-		Seasons: 0,
-	})
-	_, err = srv.RemoveSerialV1(nil, &api.RemoveSerialRequestV1{
-		Id: 13333,
-	})
-
-	_, _ = srv.UpdateSerialV1(nil, &api.UpdateSerialRequestV1{
-		Serial: &api.SerialV1{
-			Id:      21,
-			UserId:  1,
-			Title:   "DEADBEEF",
-			Genre:   "DEADBEEF",
-			Year:    2021,
-			Seasons: 10,
-		},
-	})
-
 	s := grpc.NewServer()
 
 	api.RegisterOvaSerialServer(s, srv)

@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/opentracing/opentracing-go"
 	opentracingLog "github.com/opentracing/opentracing-go/log"
 	"github.com/rs/zerolog/log"
@@ -14,7 +15,6 @@ import (
 	"ova-serial-api/internal/repo"
 	"ova-serial-api/internal/utils"
 	api "ova-serial-api/pkg/ova-serial-api"
-	"strconv"
 )
 
 type OvaSerialAPI struct {
@@ -34,28 +34,20 @@ func NewSerialAPI(repo repo.Repo, kafkaClient kafka_client.Client) api.OvaSerial
 	}
 }
 
-type cudEvent uint8
-
-const (
-	createEvent cudEvent = iota
-	updateEvent
-	deleteEvent
-)
-
-func (s *OvaSerialAPI) sendKafkaCUDEvent(event cudEvent) error {
-	return s.kafkaClient.SendMessage([]byte(strconv.Itoa(int(event))))
+func (s *OvaSerialAPI) sendKafkaCUDEvent(detail string) error {
+	return s.kafkaClient.SendMessage(detail)
 }
 
-func (s *OvaSerialAPI) sendKafkaCreateEvent() error {
-	return s.sendKafkaCUDEvent(createEvent)
+func (s *OvaSerialAPI) sendKafkaCreateEvent(detail string) error {
+	return s.sendKafkaCUDEvent(detail)
 }
 
-func (s *OvaSerialAPI) sendKafkaUpdateEvent() error {
-	return s.sendKafkaCUDEvent(updateEvent)
+func (s *OvaSerialAPI) sendKafkaUpdateEvent(detail string) error {
+	return s.sendKafkaCUDEvent(detail)
 }
 
-func (s *OvaSerialAPI) sendKafkaDeleteEvent() error {
-	return s.sendKafkaCUDEvent(deleteEvent)
+func (s *OvaSerialAPI) sendKafkaRemoveEvent(detail string) error {
+	return s.sendKafkaCUDEvent(detail)
 }
 
 func (a *OvaSerialAPI) CreateSerialV1(ctx context.Context, req *api.CreateSerialRequestV1) (res *api.CreateSerialResponseV1, err error) {
@@ -71,10 +63,6 @@ func (a *OvaSerialAPI) CreateSerialV1(ctx context.Context, req *api.CreateSerial
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	if sendError := a.sendKafkaCreateEvent(); sendError != nil {
-		log.Error().Msgf("Can not send create event to kafka, error: %s", sendError)
-	}
-
 	serial := model.Serial{
 		UserID:  req.UserId,
 		Title:   req.Title,
@@ -83,7 +71,13 @@ func (a *OvaSerialAPI) CreateSerialV1(ctx context.Context, req *api.CreateSerial
 		Seasons: req.Seasons,
 	}
 
-	log.Info().Msgf("Create serial: %+v", serial)
+	logMessage := fmt.Sprintf("Create serial: %+v", serial)
+
+	if sendError := a.sendKafkaCreateEvent(logMessage); sendError != nil {
+		log.Error().Msgf("Error occurred while sending create event to kafka, error: %s", sendError)
+	}
+
+	log.Info().Msg(logMessage)
 
 	id, err := a.repo.AddEntity(serial)
 	if err != nil {
@@ -205,11 +199,12 @@ func (a *OvaSerialAPI) RemoveSerialV1(ctx context.Context, req *api.RemoveSerial
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	if err = a.sendKafkaDeleteEvent(); err != nil {
+	logMessage := fmt.Sprintf("Remove serial with Id: %d", req.Id)
+	if err = a.sendKafkaRemoveEvent(logMessage); err != nil {
 		log.Error().Msgf("Error sending remove event to kafka, error: %s", err)
 	}
 
-	log.Info().Msgf("Remove serial with Id: %d", req.Id)
+	log.Info().Msg(logMessage)
 
 	err = a.repo.RemoveEntity(req.Id)
 	if err != nil {
@@ -233,10 +228,6 @@ func (a *OvaSerialAPI) UpdateSerialV1(ctx context.Context, req *api.UpdateSerial
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	if err = a.sendKafkaUpdateEvent(); err != nil {
-		log.Error().Msgf("Error sending update event to kafka, error: %s", err)
-	}
-
 	serial := model.Serial{
 		ID:      req.Serial.Id,
 		UserID:  req.Serial.UserId,
@@ -246,7 +237,13 @@ func (a *OvaSerialAPI) UpdateSerialV1(ctx context.Context, req *api.UpdateSerial
 		Seasons: req.Serial.Seasons,
 	}
 
-	log.Info().Msgf("Update serial: %+v", serial)
+	logMessage := fmt.Sprintf("Update serial: %+v", serial)
+
+	if err = a.sendKafkaUpdateEvent(logMessage); err != nil {
+		log.Error().Msgf("Error sending update event to kafka, error: %s", err)
+	}
+
+	log.Info().Msg(logMessage)
 
 	err = a.repo.UpdateEntity(serial)
 	if err != nil {
