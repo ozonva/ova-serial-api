@@ -135,6 +135,7 @@ func (a *OvaSerialAPI) UpdateSerialV1(ctx context.Context, req *api.UpdateSerial
 
 	err := a.repo.UpdateEntity(serial)
 	if err != nil {
+		log.Error().Msgf("Error occurred while updating serial with Id %d: %+v", req.Serial.Id, err)
 		return nil, getErrorText(err)
 	}
 
