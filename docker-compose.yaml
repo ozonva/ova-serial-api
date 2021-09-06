@@ -5,6 +5,8 @@ services:
     build: .
     environment:
       CONFIG_DIR: docker
+      DB_DRIVER: postgres
+      DB_STRING: "host=db port=5432 user=postgres password=postgres dbname=ova_serial sslmode=disable"
     restart: always
     ports:
       - "8000:8000"
@@ -70,6 +72,17 @@ services:
       - "16686:16686"
       - "14268:14268"
       - "9411:9411"
+    networks:
+      - ozonva
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090/tcp
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
     networks:
       - ozonva
 

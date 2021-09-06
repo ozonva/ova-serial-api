@@ -9,9 +9,16 @@ CREATE table serial
     year    int          not null,
     seasons int          not null
 );
+
+COMMENT ON TABLE serial IS 'table with user serials';
+COMMENT ON COLUMN serial.user_id IS 'owner id';
+COMMENT ON COLUMN serial.title IS 'serial title';
+COMMENT ON COLUMN serial.genre IS 'serial genre';
+COMMENT ON COLUMN serial.year IS 'the year first series came out';
+COMMENT ON COLUMN serial.seasons IS 'number of seasons';
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP table serial
+DROP table serial;
 -- +goose StatementEnd
