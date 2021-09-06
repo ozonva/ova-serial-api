@@ -6,12 +6,12 @@ import (
 )
 
 type Metrics interface {
-	incSuccessCreateSerialCounter()
-	incFailCreateSerialCounter()
-	incSuccessRemoveSerialCounter()
-	incFailRemoveSerialCounter()
-	incSuccessUpdateSerialCounter()
-	incFailUpdateSerialCounter()
+	IncSuccessCreateSerialCounter()
+	IncFailCreateSerialCounter()
+	IncSuccessRemoveSerialCounter()
+	IncFailRemoveSerialCounter()
+	IncSuccessUpdateSerialCounter()
+	IncFailUpdateSerialCounter()
 }
 
 const (
@@ -27,14 +27,13 @@ type metrics struct {
 	updateSerialCounter *prometheus.CounterVec
 }
 
-func newApiMetrics() Metrics {
+func NewApiMetrics() Metrics {
 	return &metrics{
 		createSerialCounter: promauto.NewCounterVec(prometheus.CounterOpts{
 			Name: "create_serial_request_count",
 			Help: "number of created serials",
 		},
 			labels),
-
 		removeSerialCounter: promauto.NewCounterVec(prometheus.CounterOpts{
 			Name: "remove_serial_request_count",
 			Help: "number of removed serials",
@@ -48,26 +47,26 @@ func newApiMetrics() Metrics {
 	}
 }
 
-func (m *metrics) incSuccessCreateSerialCounter() {
+func (m *metrics) IncSuccessCreateSerialCounter() {
 	m.createSerialCounter.WithLabelValues(successResultLabel).Inc()
 }
 
-func (m *metrics) incFailCreateSerialCounter() {
+func (m *metrics) IncFailCreateSerialCounter() {
 	m.createSerialCounter.WithLabelValues(failResultLabel).Inc()
 }
 
-func (m *metrics) incSuccessRemoveSerialCounter() {
+func (m *metrics) IncSuccessRemoveSerialCounter() {
 	m.removeSerialCounter.WithLabelValues(successResultLabel).Inc()
 }
 
-func (m *metrics) incFailRemoveSerialCounter() {
+func (m *metrics) IncFailRemoveSerialCounter() {
 	m.removeSerialCounter.WithLabelValues(failResultLabel).Inc()
 }
 
-func (m *metrics) incSuccessUpdateSerialCounter() {
+func (m *metrics) IncSuccessUpdateSerialCounter() {
 	m.updateSerialCounter.WithLabelValues(successResultLabel).Inc()
 }
 
-func (m *metrics) incFailUpdateSerialCounter() {
+func (m *metrics) IncFailUpdateSerialCounter() {
 	m.updateSerialCounter.WithLabelValues(failResultLabel).Inc()
 }

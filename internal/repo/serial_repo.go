@@ -44,7 +44,7 @@ func (r *serial_repo) AddEntities(entities []model.Serial) error {
 	}
 	defer tx.Rollback()
 	stmt, err := tx.Prepare(fmt.Sprintf(
-		"INSERT INTO %s (user_id,title,genre,year,seasons) VALUES ($1, $2, $3, $4, $5) RETURNING id", TABLE_NAME,
+		"INSERT INTO %s (user_id,title,genre,year,seasons) VALUES ($1, $2, $3, $4, $5)", TABLE_NAME,
 	))
 	if err != nil {
 		return err

@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	kafka_client "ova-serial-api/internal/kafka"
+	kafkaClient "ova-serial-api/internal/kafka"
 	"ova-serial-api/internal/model"
 	"ova-serial-api/internal/repo"
 	"ova-serial-api/internal/utils"
@@ -20,17 +20,17 @@ import (
 type OvaSerialAPI struct {
 	api.UnimplementedOvaSerialServer
 	repo        repo.Repo
-	kafkaClient kafka_client.Client
+	kafkaClient kafkaClient.Client
 	metrics     Metrics
 }
 
 const BATCH_SIZE = 2
 
-func NewSerialAPI(repo repo.Repo, kafkaClient kafka_client.Client) api.OvaSerialServer {
+func NewSerialAPI(repo repo.Repo, kafkaClient kafkaClient.Client, metrics Metrics) api.OvaSerialServer {
 	return &OvaSerialAPI{
 		repo:        repo,
 		kafkaClient: kafkaClient,
-		metrics:     newApiMetrics(),
+		metrics:     metrics,
 	}
 }
 
@@ -38,24 +38,12 @@ func (s *OvaSerialAPI) sendKafkaCUDEvent(detail string) error {
 	return s.kafkaClient.SendMessage(detail)
 }
 
-func (s *OvaSerialAPI) sendKafkaCreateEvent(detail string) error {
-	return s.sendKafkaCUDEvent(detail)
-}
-
-func (s *OvaSerialAPI) sendKafkaUpdateEvent(detail string) error {
-	return s.sendKafkaCUDEvent(detail)
-}
-
-func (s *OvaSerialAPI) sendKafkaRemoveEvent(detail string) error {
-	return s.sendKafkaCUDEvent(detail)
-}
-
 func (a *OvaSerialAPI) CreateSerialV1(ctx context.Context, req *api.CreateSerialRequestV1) (res *api.CreateSerialResponseV1, err error) {
 	defer func() {
 		if err != nil {
-			a.metrics.incFailCreateSerialCounter()
+			a.metrics.IncFailCreateSerialCounter()
 		} else {
-			a.metrics.incSuccessCreateSerialCounter()
+			a.metrics.IncSuccessCreateSerialCounter()
 		}
 	}()
 
@@ -73,7 +61,7 @@ func (a *OvaSerialAPI) CreateSerialV1(ctx context.Context, req *api.CreateSerial
 
 	logMessage := fmt.Sprintf("Create serial: %+v", serial)
 
-	if sendError := a.sendKafkaCreateEvent(logMessage); sendError != nil {
+	if sendError := a.sendKafkaCUDEvent(logMessage); sendError != nil {
 		log.Error().Msgf("Error occurred while sending create event to kafka, error: %s", sendError)
 	}
 
@@ -189,9 +177,9 @@ func (a *OvaSerialAPI) ListSerialsV1(ctx context.Context, req *api.ListSerialsRe
 func (a *OvaSerialAPI) RemoveSerialV1(ctx context.Context, req *api.RemoveSerialRequestV1) (e *emptypb.Empty, err error) {
 	defer func() {
 		if err != nil {
-			a.metrics.incFailRemoveSerialCounter()
+			a.metrics.IncFailRemoveSerialCounter()
 		} else {
-			a.metrics.incSuccessRemoveSerialCounter()
+			a.metrics.IncSuccessRemoveSerialCounter()
 		}
 	}()
 
@@ -200,7 +188,7 @@ func (a *OvaSerialAPI) RemoveSerialV1(ctx context.Context, req *api.RemoveSerial
 	}
 
 	logMessage := fmt.Sprintf("Remove serial with Id: %d", req.Id)
-	if err = a.sendKafkaRemoveEvent(logMessage); err != nil {
+	if err = a.sendKafkaCUDEvent(logMessage); err != nil {
 		log.Error().Msgf("Error sending remove event to kafka, error: %s", err)
 	}
 
@@ -218,9 +206,9 @@ func (a *OvaSerialAPI) RemoveSerialV1(ctx context.Context, req *api.RemoveSerial
 func (a *OvaSerialAPI) UpdateSerialV1(ctx context.Context, req *api.UpdateSerialRequestV1) (e *emptypb.Empty, err error) {
 	defer func() {
 		if err != nil {
-			a.metrics.incFailUpdateSerialCounter()
+			a.metrics.IncFailUpdateSerialCounter()
 		} else {
-			a.metrics.incSuccessUpdateSerialCounter()
+			a.metrics.IncSuccessUpdateSerialCounter()
 		}
 	}()
 
@@ -239,7 +227,7 @@ func (a *OvaSerialAPI) UpdateSerialV1(ctx context.Context, req *api.UpdateSerial
 
 	logMessage := fmt.Sprintf("Update serial: %+v", serial)
 
-	if err = a.sendKafkaUpdateEvent(logMessage); err != nil {
+	if err = a.sendKafkaCUDEvent(logMessage); err != nil {
 		log.Error().Msgf("Error sending update event to kafka, error: %s", err)
 	}
 

@@ -115,7 +115,7 @@ func startGRPCServer() error {
 		log.Fatal().Msgf("Error connecting to kafka, %s", kafkaConnErr)
 	}
 
-	srv := server.NewSerialAPI(repo.NewSerialRepo(db), kafkaClient)
+	srv := server.NewSerialAPI(repo.NewSerialRepo(db), kafkaClient, server.NewApiMetrics())
 	s := grpc.NewServer()
 
 	api.RegisterOvaSerialServer(s, srv)
