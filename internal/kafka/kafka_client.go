@@ -11,12 +11,12 @@ type Client interface {
 	SendMessage(message string) error
 }
 
-func NewKafkaClient() Client {
-	return &client{}
-}
-
 type client struct {
 	conn *kafka.Conn
+}
+
+func NewKafkaClient() Client {
+	return &client{}
 }
 
 func (c *client) Connect(ctx context.Context, dsn string, topic string, partition int) error {

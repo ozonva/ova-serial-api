@@ -30,6 +30,7 @@ const (
 	configPath         = "config/test_config.yaml"
 	confUpdIntervalSec = 10
 	grpcPort           = ":82"
+	prometheusPort     = ":8081"
 	serviceName        = "ova-serial-api"
 	kafkaTopic         = "serial-CUD-events"
 )
@@ -59,7 +60,7 @@ func main() {
 
 func runPrometheusMetrics() {
 	http.Handle("/metrics", promhttp.Handler())
-	if err := http.ListenAndServe(":8081", nil); err != nil {
+	if err := http.ListenAndServe(prometheusPort, nil); err != nil {
 		log.Fatal().Msgf("Failed to start listen to metric requests, error %s", err)
 	}
 }
@@ -84,7 +85,7 @@ func initTracer() (opentracing.Tracer, io.Closer) {
 		jaegercfg.Metrics(jMetricsFactory),
 	)
 	if err != nil {
-		log.Fatal().Msgf("Can not create tracer, %s", err)
+		log.Fatal().Msgf("Failed to create tracer, %s", err)
 	}
 	return tracer, closer
 }
