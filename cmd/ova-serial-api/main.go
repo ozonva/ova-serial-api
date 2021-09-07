@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -30,6 +31,7 @@ const (
 	configPath         = "config/test_config.yaml"
 	confUpdIntervalSec = 10
 	grpcPort           = ":82"
+	httpPort           = ":8085"
 	prometheusPort     = ":8081"
 	serviceName        = "ova-serial-api"
 	kafkaTopic         = "serial-CUD-events"
@@ -53,9 +55,9 @@ func main() {
 	opentracing.SetGlobalTracer(tracer)
 	defer closer.Close()
 
-	if err := startGRPCServer(); err != nil {
-		log.Fatal().Msgf("Error while starting server: %v", err)
-	}
+	go startGRPCServer(grpcPort)
+
+	startHttpServer(context.Background(), grpcPort, httpPort)
 }
 
 func runPrometheusMetrics() {
@@ -90,7 +92,22 @@ func initTracer() (opentracing.Tracer, io.Closer) {
 	return tracer, closer
 }
 
-func startGRPCServer() error {
+func startHttpServer(ctx context.Context, grpcPort, httpPort string) error {
+	mux := runtime.NewServeMux()
+	opts := []grpc.DialOption{grpc.WithInsecure()}
+	if err := api.RegisterOvaSerialHandlerFromEndpoint(ctx, mux, "localhost"+grpcPort, opts); err != nil {
+		log.Fatal().Msgf("Failed to start HTTP gateway: %v", err)
+	}
+
+	srv := &http.Server{
+		Addr:    httpPort,
+		Handler: mux,
+	}
+
+	return srv.ListenAndServe()
+}
+
+func startGRPCServer(grpcPort string) error {
 	listen, err := net.Listen("tcp", grpcPort)
 	if err != nil {
 		log.Fatal().Msgf("Failed to listen: %v", err)
@@ -116,6 +133,52 @@ func startGRPCServer() error {
 	}
 
 	srv := server.NewSerialAPI(repo.NewSerialRepo(db), kafkaClient, server.NewApiMetrics())
+	_, _ = srv.MultiCreateSerialV1(context.TODO(), &api.MultiCreateSerialRequestV1{
+		Serials: []*api.SerialV1{
+			{
+				Id:      11,
+				UserId:  11,
+				Title:   "11abc",
+				Genre:   "DEADBEEF",
+				Year:    2011,
+				Seasons: 11,
+			},
+			{
+				Id:      12,
+				UserId:  12,
+				Title:   "12abc",
+				Genre:   "DEADBEEF",
+				Year:    2012,
+				Seasons: 12,
+			},
+			{
+				Id:      13,
+				UserId:  13,
+				Title:   "13abc",
+				Genre:   "DEADBEEF",
+				Year:    2013,
+				Seasons: 13,
+			},
+		},
+	})
+
+	srv.CreateSerialV1(nil, &api.CreateSerialRequestV1{
+		UserId:  0,
+		Title:   "",
+		Genre:   "",
+		Year:    0,
+		Seasons: 0,
+	})
+	_, _ = srv.UpdateSerialV1(nil, &api.UpdateSerialRequestV1{
+		Serial: &api.SerialV1{
+			Id:      79,
+			UserId:  1,
+			Title:   "test123",
+			Genre:   "test123",
+			Year:    2021,
+			Seasons: 10,
+		},
+	})
 	s := grpc.NewServer()
 
 	api.RegisterOvaSerialServer(s, srv)
@@ -124,6 +187,7 @@ func startGRPCServer() error {
 		log.Fatal().Msgf("Failed to serve: %v", err)
 		return err
 	}
+	s.Serve(listen)
 
 	return nil
 }

@@ -16,7 +16,7 @@ service OvaSerial {
   }
   rpc MultiCreateSerialV1 (MultiCreateSerialRequestV1) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/v1/serials"
+      post: "/v1/serials/multi"
       body: "*"
     };
   }

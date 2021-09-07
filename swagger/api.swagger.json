@@ -54,6 +54,38 @@
         ]
       },
       "post": {
+        "operationId": "OvaSerial_CreateSerialV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCreateSerialResponseV1"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiCreateSerialRequestV1"
+            }
+          }
+        ],
+        "tags": [
+          "OvaSerial"
+        ]
+      }
+    },
+    "/v1/serials/multi": {
+      "post": {
         "operationId": "OvaSerial_MultiCreateSerialV1",
         "responses": {
           "200": {
