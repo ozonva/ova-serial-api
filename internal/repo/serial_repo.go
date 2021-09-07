@@ -20,7 +20,9 @@ func NewSerialRepo(db *sqlx.DB) Repo {
 
 func (r *serial_repo) AddEntity(entity model.Serial) (int64, error) {
 	var id int64
-	query, err := r.db.PrepareNamed(fmt.Sprintf("INSERT INTO %s (user_id,title,genre,year,seasons) VALUES (:user_id,:title,:genre,:year,:seasons) RETURNING id", TABLE_NAME))
+	query, err := r.db.PrepareNamed(fmt.Sprintf(
+		"INSERT INTO %s (user_id,title,genre,year,seasons) VALUES (:user_id,:title,:genre,:year,:seasons) RETURNING id", TABLE_NAME,
+	))
 
 	if err != nil {
 		return 0, err
@@ -36,7 +38,25 @@ func (r *serial_repo) AddEntity(entity model.Serial) (int64, error) {
 }
 
 func (r *serial_repo) AddEntities(entities []model.Serial) error {
-	return nil
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	stmt, err := tx.Prepare(fmt.Sprintf(
+		"INSERT INTO %s (user_id,title,genre,year,seasons) VALUES ($1, $2, $3, $4, $5)", TABLE_NAME,
+	))
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	for _, serial := range entities {
+		_, execErr := stmt.Exec(serial.UserID, serial.Title, serial.Genre, serial.Year, serial.Seasons)
+		if execErr != nil {
+			return execErr
+		}
+	}
+	return tx.Commit()
 }
 
 func (r *serial_repo) ListEntities(limit, offset uint64) ([]model.Serial, error) {
@@ -76,6 +96,37 @@ func (r *serial_repo) RemoveEntity(entityID int64) error {
 			Operation: "remove",
 			Table:     TABLE_NAME,
 			Id:        entityID,
+		}
+	}
+
+	return nil
+}
+
+func (r *serial_repo) UpdateEntity(entity model.Serial) error {
+	res, err := r.db.NamedExec(`UPDATE serial SET user_id=:user_id, title=:title, genre=:genre, year =:year, seasons=:seasons WHERE id=:id`,
+		map[string]interface{}{
+			"id":      entity.ID,
+			"user_id": entity.UserID,
+			"title":   entity.Title,
+			"genre":   entity.Genre,
+			"year":    entity.Year,
+			"seasons": entity.Seasons,
+		})
+
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return &NotFound{
+			Operation: "update",
+			Table:     TABLE_NAME,
+			Id:        entity.ID,
 		}
 	}
 

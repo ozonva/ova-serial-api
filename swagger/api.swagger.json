@@ -84,6 +84,38 @@
         ]
       }
     },
+    "/v1/serials/multi": {
+      "post": {
+        "operationId": "OvaSerial_MultiCreateSerialV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiMultiCreateSerialRequestV1"
+            }
+          }
+        ],
+        "tags": [
+          "OvaSerial"
+        ]
+      }
+    },
     "/v1/serials/{id}": {
       "get": {
         "operationId": "OvaSerial_GetSerialV1",
@@ -137,6 +169,45 @@
             "required": true,
             "type": "string",
             "format": "int64"
+          }
+        ],
+        "tags": [
+          "OvaSerial"
+        ]
+      }
+    },
+    "/v1/serials/{serial.id}": {
+      "put": {
+        "operationId": "OvaSerial_UpdateSerialV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "serial.id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiUpdateSerialRequestV1"
+            }
           }
         ],
         "tags": [
@@ -197,6 +268,17 @@
         }
       }
     },
+    "apiMultiCreateSerialRequestV1": {
+      "type": "object",
+      "properties": {
+        "serials": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/apiSerialV1"
+          }
+        }
+      }
+    },
     "apiSerialV1": {
       "type": "object",
       "properties": {
@@ -221,6 +303,14 @@
         "seasons": {
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "apiUpdateSerialRequestV1": {
+      "type": "object",
+      "properties": {
+        "serial": {
+          "$ref": "#/definitions/apiSerialV1"
         }
       }
     },

@@ -14,6 +14,12 @@ service OvaSerial {
       body: "*"
     };
   }
+  rpc MultiCreateSerialV1 (MultiCreateSerialRequestV1) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/serials/multi"
+      body: "*"
+    };
+  }
   rpc GetSerialV1 (GetSerialRequestV1) returns (GetSerialResponseV1) {
     option (google.api.http) = {
       get: "/v1/serials/{id}"
@@ -27,6 +33,12 @@ service OvaSerial {
   rpc RemoveSerialV1 (RemoveSerialRequestV1) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/v1/serials/{id}"
+    };
+  }
+  rpc UpdateSerialV1 (UpdateSerialRequestV1) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/v1/serials/{serial.id}",
+      body: "*"
     };
   }
 }
@@ -47,6 +59,10 @@ message GetSerialRequestV1 {
   int64 id = 1;
 }
 
+message MultiCreateSerialRequestV1 {
+  repeated SerialV1 serials = 1;
+}
+
 message GetSerialResponseV1 {
   SerialV1 serial = 1;
 }
@@ -62,6 +78,10 @@ message ListSerialsResponseV1 {
 
 message RemoveSerialRequestV1 {
   int64 id = 1;
+}
+
+message UpdateSerialRequestV1 {
+  SerialV1 serial = 1;
 }
 
 message SerialV1 {

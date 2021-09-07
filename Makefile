@@ -39,10 +39,28 @@ deps:
 
 .PHONY: build
 build: deps
-	go build -o $(CURDIR)/bin/project $(CURDIR)/main.go
+	go build -o $(CURDIR)/bin/project $(CURDIR)/cmd/ova-serial-api/main.go
+
+.PHONY: run
+run:
+	go run ./cmd/ova-serial-api/main.go
 
 go-deps:
 	ls go.mod
+		GOBIN=$(LOCAL_BIN) go get -u github.com/pkg/errors
+		GOBIN=$(LOCAL_BIN) go get -u github.com/onsi/ginkgo
+		GOBIN=$(LOCAL_BIN) go get -u github.com/onsi/gomega
+		GOBIN=$(LOCAL_BIN) go get -u github.com/golang/mock
+		GOBIN=$(LOCAL_BIN) go get -u github.com/rs/zerolog/log
+		GOBIN=$(LOCAL_BIN) go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
+		GOBIN=$(LOCAL_BIN) go get -u github.com/golang/protobuf/proto
+		GOBIN=$(LOCAL_BIN) go get -u github.com/golang/protobuf/protoc-gen-go
+		GOBIN=$(LOCAL_BIN) go get -u google.golang.org/grpc
+		GOBIN=$(LOCAL_BIN) go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
+		GOBIN=$(LOCAL_BIN) go get -u google.golang.org/protobuf/reflect/protoreflect
+		GOBIN=$(LOCAL_BIN) go get -u google.golang.org/protobuf/runtime/protoimpl
+		GOBIN=$(LOCAL_BIN) go get -u github.com/jmoiron/sqlx
+		GOBIN=$(LOCAL_BIN) go get -u github.com/lib/pq
 		GOBIN=$(LOCAL_BIN) go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 		GOBIN=$(LOCAL_BIN) go get -u github.com/golang/protobuf/proto
 		GOBIN=$(LOCAL_BIN) go get -u github.com/golang/protobuf/protoc-gen-go
@@ -51,3 +69,7 @@ go-deps:
 		GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
 		GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 		GOBIN=$(LOCAL_BIN) go install github.com/envoyproxy/protoc-gen-validate
+		GOBIN=$(LOCAL_BIN) go install github.com/opentracing/opentracing-go/log
+		GOBIN=$(LOCAL_BIN) go install github.com/segmentio/kafka-go
+		GOBIN=$(LOCAL_BIN) go install github.com/prometheus/client_golang/prometheus
+		GOBIN=$(LOCAL_BIN) go install github.com/prometheus/client_golang/prometheus/promauto
