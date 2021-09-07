@@ -37,7 +37,8 @@ service OvaSerial {
   }
   rpc UpdateSerialV1 (UpdateSerialRequestV1) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      put: "/v1/serials/{serial.id}"
+      put: "/v1/serials/{serial.id}",
+      body: "*"
     };
   }
 }

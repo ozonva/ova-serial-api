@@ -200,6 +200,14 @@
             "required": true,
             "type": "string",
             "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiUpdateSerialRequestV1"
+            }
           }
         ],
         "tags": [
@@ -295,6 +303,14 @@
         "seasons": {
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "apiUpdateSerialRequestV1": {
+      "type": "object",
+      "properties": {
+        "serial": {
+          "$ref": "#/definitions/apiSerialV1"
         }
       }
     },
